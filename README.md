@@ -19,6 +19,7 @@ git checkout -b luis-feature
 ### 3. Instalar as dependências
 ```bash
 npm install
+npm install -g @quasar/cli
 ```
 
 ### 4. Executar o projeto
