@@ -1,10 +1,3 @@
-Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com uma **toolbar de variáveis**. Assim, em vez de ter que digitar manualmente `{{email}}` ou `{{data}}`, o usuário só clica em um botão e o placeholder é inserido automaticamente no texto.  
-
----
-
-## 🟢 Código completo ajustado (TemplateList.vue)
-
-```vue
 <template>
   <q-page class="q-pa-lg bg-grey-2">
     <!-- Cabeçalho com usuário logado -->
@@ -31,11 +24,16 @@ Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com u
     </div>
 
     <!-- Botão novo template -->
-    <q-btn label="Novo Template" color="primary" icon="add" class="q-mb-md shadow-2" @click="openDialog()" />
+  <q-btn label="Novo Template" color="primary" icon="add" class="q-mb-md shadow-2" @click="openDialog()" />
+  <q-input v-model="search" label="Buscar template" outlined class="q-mb-md" />
+  <q-tabs v-model="tab" class="text-primary q-mb-md" align="left">
+  <q-tab name="all" label="Todos" icon="list" />
+  <q-tab name="favorites" label="Favoritos" icon="star" />
+  </q-tabs>
 
     <!-- Tabela -->
     <q-table
-      :rows="templates"
+      :rows="displayedTemplates"
       :columns="columns"
       row-key="id"
       flat
@@ -46,6 +44,9 @@ Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com u
       <template v-slot:body-cell-title="props">
         <q-td>
           <div class="text-bold text-primary">{{ props.row.title }}</div>
+          <div>
+            <q-chip v-for="tag in props.row.tags" :key="tag" color="secondary" text-color="white" dense>{{ tag }}</q-chip>
+          </div>
         </q-td>
       </template>
 
@@ -54,8 +55,11 @@ Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com u
         <q-td class="text-right">
           <q-btn dense flat icon="edit" color="primary" @click="editTemplate(props.row)" :title="'Editar'" />
           <q-btn dense flat icon="delete" color="negative" @click="deleteTemplate(props.row.id)" :title="'Excluir'" />
+          <q-btn dense flat icon="content_copy" color="info" @click="duplicateTemplate(props.row)" :title="'Duplicar'" />
           <q-btn dense flat icon="send" color="secondary" @click="prepareSend(props.row)" :title="'Preencher variáveis'" />
           <q-btn dense flat icon="visibility" color="accent" @click="preparePreview(props.row)" :title="'Visualizar'" />
+        <q-btn dense flat :icon="props.row.favorite ? 'star' : 'star_border'" :color="props.row.favorite ? 'warning' : 'grey'" @click="toggleFavorite(props.row)" :title="'Favorito'" />
+
         </q-td>
       </template>
     </q-table>
@@ -69,6 +73,16 @@ Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com u
 
         <q-card-section>
           <q-input v-model="currentTemplate.title" label="Título" outlined class="q-mb-md" />
+
+          <!-- Categorias -->
+          <q-select
+            v-model="currentTemplate.tags"
+            :options="['Marketing','Convite','Aviso','Informativo']"
+            label="Categorias"
+            multiple
+            outlined
+            class="q-mb-md"
+          />
 
           <!-- Toolbar de variáveis -->
           <div class="row q-gutter-sm q-mb-md">
@@ -139,10 +153,11 @@ Perfeito, Luis — vamos deixar o editor de templates muito mais amigável com u
       </q-card>
     </q-dialog>
   </q-page>
-</template>
 
+
+</template>
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -153,10 +168,28 @@ const dialog = ref(false)
 const sendDialog = ref(false)
 const previewDialog = ref(false)
 const editing = ref(false)
-const currentTemplate = ref({ id: null, title: '', content: '' })
+const currentTemplate = ref({ id: null, title: '', content: '', tags: [], favorite: false })
 const variables = ref([])
 const filledVars = ref({})
 const previewHtml = ref('')
+
+// 🔎 Campo de busca
+const search = ref('')
+const filteredTemplates = computed(() => {
+  return templates.value.filter(t =>
+    t.title.toLowerCase().includes(search.value.toLowerCase()) ||
+    t.content.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
+
+// ⭐ Favoritos
+const tab = ref('all')
+const displayedTemplates = computed(() => {
+  if (tab.value === 'favorites') {
+    return filteredTemplates.value.filter(t => t.favorite)
+  }
+  return filteredTemplates.value
+})
 
 const columns = [
   { name: 'title', label: 'Título', field: 'title' },
@@ -166,7 +199,8 @@ const columns = [
 function loadTemplates () {
   const key = `templates_${user.value.email}`
   const saved = JSON.parse(localStorage.getItem(key)) || []
-  templates.value = saved
+  // garantir que todos tenham campo favorite
+  templates.value = saved.map(t => ({ ...t, favorite: t.favorite || false }))
 }
 
 function saveTemplates () {
@@ -176,7 +210,7 @@ function saveTemplates () {
 
 function openDialog () {
   editing.value = false
-  currentTemplate.value = { id: null, title: '', content: '' }
+  currentTemplate.value = { id: null, title: '', content: '', tags: [], favorite: false }
   dialog.value = true
 }
 
@@ -201,6 +235,25 @@ function saveTemplate () {
 function deleteTemplate (id) {
   templates.value = templates.value.filter(t => t.id !== id)
   saveTemplates()
+}
+
+function duplicateTemplate (template) {
+  const newTemplate = {
+    ...template,
+    id: Date.now(),
+    title: `Cópia de ${template.title}`,
+    favorite: false
+  }
+  templates.value.push(newTemplate)
+  saveTemplates()
+}
+
+function toggleFavorite (template) {
+  const index = templates.value.findIndex(t => t.id === template.id)
+  if (index !== -1) {
+    templates.value[index].favorite = !templates.value[index].favorite
+    saveTemplates()
+  }
 }
 
 function prepareSend (template) {
@@ -274,3 +327,4 @@ onMounted(() => {
   loadTemplates()
 })
 </script>
+  
