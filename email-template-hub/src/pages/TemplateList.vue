@@ -1,6 +1,5 @@
 <template>
-  <q-page class="q-pa-lg bg-grey-2">
-    <!-- Cabeçalho com usuário logado -->
+  <q-page class="q-pa-xl">
     <div class="row items-center justify-between q-mb-lg">
       <div class="text-h5 text-primary">Meus Templates</div>
       <q-btn flat round icon="account_circle" color="primary">
@@ -23,14 +22,27 @@
       </q-btn>
     </div>
 
-    <!-- Botão novo template -->
-  <q-btn label="Novo Template" color="primary" icon="add" class="q-mb-md shadow-2" @click="openDialog()" />
-  <q-input v-model="search" label="Buscar template" outlined class="q-mb-md" />
-  <q-tabs v-model="tab" class="text-primary q-mb-md" align="left">
-  <q-tab name="all" label="Todos" icon="list" />
-  <q-tab name="favorites" label="Favoritos" icon="star" />
-  <q-tab name="history" label="Histórico" icon="history" />
+    <!-- Tabs + Botão na mesma linha -->
+<div class="row items-center q-mb-md">
+  <!-- Tabs alinhados à esquerda -->
+  <q-tabs v-model="tab" class="text-primary" align="left">
+    <q-tab name="all" label="Todos" icon="list" />
+    <q-tab name="favorites" label="Favoritos" icon="star" />
+    <q-tab name="history" label="Histórico" icon="history" />
   </q-tabs>
+
+  <!-- Espaço flexível -->
+  <q-space />
+
+  <!-- Botão alinhado à direita -->
+  <q-btn
+    label="Novo Template"
+    color="primary"
+    icon="add"
+    class="shadow-2"
+    @click="openDialog()"
+  />
+</div>
   
     <!-- Tabela -->
     <q-table
@@ -43,15 +55,23 @@
       class="shadow-2 rounded-borders"
     >
     
-      <!-- Título alinhado à esquerda -->
       <template v-slot:body-cell-title="props">
-        <q-td>
-          <div class="text-bold text-primary">{{ props.row.title }}</div>
-          <div>
-            <q-chip v-for="tag in props.row.tags" :key="tag" color="secondary" text-color="white" dense>{{ tag }}</q-chip>
-          </div>
-        </q-td>
+       <q-td class="text-center">
+         <div class="text-bold text-primary">{{ props.row.title }}</div>
+         <div>
+           <q-chip
+             v-for="tag in props.row.tags"
+             :key="tag"
+             color="secondary"
+             text-color="white"
+             dense
+           >
+             {{ tag }}
+           </q-chip>
+         </div>
+       </q-td>
       </template>
+
 
       <!-- Ações alinhadas à direita -->
       <template v-slot:body-cell-actions="props">
@@ -235,6 +255,8 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    
   </q-page>
 
 
