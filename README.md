@@ -20,6 +20,7 @@ git checkout -b luis-feature
 ```bash
 npm install
 npm install -g @quasar/cli
+npm install googleapis
 ```
 
 ### 4. Executar o projeto
