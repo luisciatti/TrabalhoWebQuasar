@@ -29,10 +29,12 @@
   <q-tabs v-model="tab" class="text-primary q-mb-md" align="left">
   <q-tab name="all" label="Todos" icon="list" />
   <q-tab name="favorites" label="Favoritos" icon="star" />
+  <q-tab name="history" label="Histórico" icon="history" />
   </q-tabs>
-
+  
     <!-- Tabela -->
     <q-table
+      v-if="tab !== 'history'"
       :rows="displayedTemplates"
       :columns="columns"
       row-key="id"
@@ -40,6 +42,7 @@
       bordered
       class="shadow-2 rounded-borders"
     >
+    
       <!-- Título alinhado à esquerda -->
       <template v-slot:body-cell-title="props">
         <q-td>
@@ -63,6 +66,20 @@
         </q-td>
       </template>
     </q-table>
+    <q-table
+  v-else
+  :rows="historicoEnvios"
+  :columns="[
+    { name: 'templateTitle', label: 'Template', field: 'templateTitle' },
+    { name: 'assunto', label: 'Assunto', field: 'assunto' },
+    { name: 'destinatario', label: 'Destinatário', field: 'destinatario' },
+    { name: 'data', label: 'Data', field: 'data' }
+  ]"
+  row-key="id"
+  flat
+  bordered
+  class="shadow-2 rounded-borders"
+/>
 
     <!-- Dialog criar/editar -->
     <q-dialog v-model="dialog">
@@ -109,25 +126,46 @@
       </q-card>
     </q-dialog>
 
-    <!-- Dialog preencher variáveis (Enviar) -->
-    <q-dialog v-model="sendDialog">
-      <q-card style="min-width: 600px" class="shadow-3 rounded-borders">
-        <q-card-section>
-          <div class="text-h6 text-primary">Preencher variáveis</div>
-        </q-card-section>
+    <!-- Dialog preencher variáveis -->
+<q-dialog v-model="sendDialog">
+  <q-card style="min-width: 600px" class="shadow-3 rounded-borders">
+    <q-card-section>
+      <div class="text-h6 text-primary">Preencher variáveis</div>
+    </q-card-section>
 
-        <q-card-section>
-          <div v-for="variable in variables" :key="variable" class="q-mb-md">
-            <q-input v-model="filledVars[variable]" :label="variable" outlined />
-          </div>
-        </q-card-section>
+    <q-card-section>
+      <div v-for="variable in variables" :key="variable" class="q-mb-md">
+        <q-input v-model="filledVars[variable]" :label="variable" outlined />
+      </div>
+    </q-card-section>
 
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn label="Copiar HTML" color="primary" @click="exportHtml()" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <q-card-actions align="right">
+      <q-btn flat label="Cancelar" v-close-popup />
+      <q-btn label="Próximo" color="primary" @click="openSendPreview()" />
+    </q-card-actions>
+  </q-card>
+</q-dialog>
+
+<!-- Dialog enviar email (separado, fora do anterior) -->
+<q-dialog v-model="finalSendDialog">
+  <q-card style="min-width: 600px" class="shadow-3 rounded-borders">
+    <q-card-section>
+      <div class="text-h6 text-primary">Enviar Email</div>
+    </q-card-section>
+
+    <q-card-section>
+      <q-input v-model="destinatario" label="Destinatário" outlined class="q-mb-md" />
+      <q-input v-model="assuntoEmail" label="Assunto" outlined class="q-mb-md" />
+      <div v-html="previewHtml" class="q-pa-lg bg-white shadow-2 rounded-borders" style="min-height:200px;" />
+    </q-card-section>
+
+    <q-card-actions align="right">
+      <q-btn flat label="Cancelar" v-close-popup />
+      <q-btn label="Enviar" color="primary" @click="sendEmail(currentTemplate, destinatario)" />
+    </q-card-actions>
+  </q-card>
+</q-dialog>
+
 
     <!-- Dialog visualizar -->
     <q-dialog v-model="previewDialog" maximized>
@@ -157,6 +195,7 @@
 
 </template>
 <script setup>
+import { showSuccess, showError, showConfirm } from 'src/helpers/notify'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -172,6 +211,10 @@ const currentTemplate = ref({ id: null, title: '', content: '', tags: [], favori
 const variables = ref([])
 const filledVars = ref({})
 const previewHtml = ref('')
+const finalSendDialog = ref(false)
+const destinatario = ref('')
+const historicoEnvios = ref([])
+const assuntoEmail = ref('')
 
 // 🔎 Campo de busca
 const search = ref('')
@@ -182,11 +225,15 @@ const filteredTemplates = computed(() => {
   )
 })
 
-// ⭐ Favoritos
+// ⭐ history
 const tab = ref('all')
+
 const displayedTemplates = computed(() => {
   if (tab.value === 'favorites') {
     return filteredTemplates.value.filter(t => t.favorite)
+  }
+  if (tab.value === 'history') {
+    return historicoEnvios.value
   }
   return filteredTemplates.value
 })
@@ -232,10 +279,14 @@ function saveTemplate () {
   dialog.value = false
 }
 
-function deleteTemplate (id) {
-  templates.value = templates.value.filter(t => t.id !== id)
-  saveTemplates()
+function deleteTemplate(id) {
+  showConfirm('Excluir Template', 'Tem certeza que deseja excluir este template?', () => {
+    templates.value = templates.value.filter(t => t.id !== id)
+    saveTemplates()
+    showSuccess('Template excluído com sucesso!')
+  })
 }
+
 
 function duplicateTemplate (template) {
   const newTemplate = {
@@ -266,16 +317,6 @@ function prepareSend (template) {
   sendDialog.value = true
 }
 
-function exportHtml () {
-  let html = currentTemplate.value.content
-  for (const key in filledVars.value) {
-    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g')
-    html = html.replace(regex, filledVars.value[key])
-  }
-  navigator.clipboard.writeText(html)
-  alert('HTML copiado para a área de transferência!')
-  sendDialog.value = false
-}
 
 function preparePreview (template) {
   currentTemplate.value = { ...template }
@@ -322,9 +363,85 @@ function logout () {
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('user'))
   if (!user.value) {
-    router.push('/login') // proteção de rota
+    router.push('/login')
   }
   loadTemplates()
+  historicoEnvios.value = JSON.parse(localStorage.getItem(`historico_${user.value.email}`)) || []
 })
+
+
+
+async function sendEmail(template, destinatario) {
+  if (!destinatario) {
+    showError('Informe um destinatário')
+    return
+  }
+
+  const subject = assuntoEmail.value || template.title
+
+  showConfirm('Enviar Email', `Deseja enviar "${subject}" para ${destinatario}?`, async () => {
+    try {
+      const token = localStorage.getItem('google_token')
+      if (!token) {
+        showError('Você precisa se conectar ao Gmail primeiro')
+        return
+      }
+
+      const rawMessage = [
+        `To: ${destinatario}`,
+        `Subject: ${subject}`,
+        "Content-Type: text/html; charset=UTF-8",
+        "",
+        previewHtml.value
+      ].join("\n")
+
+      const encodedMessage = btoa(rawMessage)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '')
+
+      await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ raw: encodedMessage })
+      })
+
+      showSuccess(`Email enviado para ${destinatario}`)
+      finalSendDialog.value = false
+
+      // salvar no histórico
+      const envio = {
+        id: Date.now(),
+        templateTitle: template.title,
+        assunto: subject,
+        destinatario,
+        data: new Date().toLocaleString()
+      }
+      historicoEnvios.value.push(envio)
+      localStorage.setItem(`historico_${user.value.email}`, JSON.stringify(historicoEnvios.value))
+    } catch (err) {
+      console.error('Erro ao enviar email:', err)
+      showError('Falha ao enviar email')
+    }
+  })
+}
+
+function openSendPreview() {
+  // monta preview substituindo variáveis
+  let html = currentTemplate.value.content
+  for (const key in filledVars.value) {
+    const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g')
+    html = html.replace(regex, filledVars.value[key])
+  }
+  previewHtml.value = html
+  sendDialog.value = false
+  finalSendDialog.value = true
+}
+
+
+
 </script>
   
