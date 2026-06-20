@@ -55,7 +55,7 @@
 
       <!-- Ações alinhadas à direita -->
       <template v-slot:body-cell-actions="props">
-        <q-td class="text-right">
+        <q-td class="text-center">
           <q-btn dense flat icon="edit" color="primary" @click="editTemplate(props.row)" :title="'Editar'" />
           <q-btn dense flat icon="delete" color="negative" @click="deleteTemplate(props.row.id)" :title="'Excluir'" />
           <q-btn dense flat icon="content_copy" color="info" @click="duplicateTemplate(props.row)" :title="'Duplicar'" />
@@ -86,9 +86,11 @@
       <q-card style="min-width: 650px" class="shadow-4 rounded-borders">
         <q-card-section>
           <div class="text-h6 text-primary">{{ editing ? 'Editar Template' : 'Novo Template' }}</div>
+          
         </q-card-section>
 
         <q-card-section>
+          
           <q-input v-model="currentTemplate.title" label="Título" outlined class="q-mb-md" />
 
           <!-- Categorias -->
@@ -100,6 +102,29 @@
             outlined
             class="q-mb-md"
           />
+          <q-input v-model="currentTemplate.fixedRecipient" label="Destinatário fixo (opcional)" outlined class="q-mb-md" />
+            <q-select
+              v-model="currentTemplate.subjectMode"
+              :options="[
+                { label: 'Usar título do template', value: 'title' },
+                { label: 'Criar novo assunto', value: 'custom' }
+              ]"
+              option-value="value"
+              option-label="label"
+              emit-value
+              map-options
+              label="Assunto do email"
+              outlined
+              class="q-mb-md"
+            />           
+
+              <q-input
+                v-if="currentTemplate.subjectMode === 'custom'"
+                v-model="currentTemplate.customSubject"
+                label="Assunto personalizado"
+                outlined
+                class="q-mb-md"
+              />
 
           <!-- Toolbar de variáveis -->
           <div class="row q-gutter-sm q-mb-md">
@@ -153,18 +178,38 @@
       <div class="text-h6 text-primary">Enviar Email</div>
     </q-card-section>
 
-    <q-card-section>
-      <q-input v-model="destinatario" label="Destinatário" outlined class="q-mb-md" />
-      <q-input v-model="assuntoEmail" label="Assunto" outlined class="q-mb-md" />
-      <div v-html="previewHtml" class="q-pa-lg bg-white shadow-2 rounded-borders" style="min-height:200px;" />
-    </q-card-section>
+<q-card-section>
+  <!-- Só mostra se não tiver destinatário fixo -->
+  <q-input
+    v-if="!currentTemplate.fixedRecipient"
+    v-model="destinatario"
+    label="Destinatário"
+    outlined
+    class="q-mb-md"
+  />
 
+  <!-- Só mostra se o modo for custom -->
+  <q-input
+    v-if="currentTemplate.subjectMode === 'custom'"
+    v-model="assuntoEmail"
+    label="Assunto personalizado"
+    outlined
+    class="q-mb-md"
+  />
+
+  <div v-html="previewHtml" class="q-pa-lg bg-white shadow-2 rounded-borders" style="min-height:200px;" />
+</q-card-section>
     <q-card-actions align="right">
       <q-btn flat label="Cancelar" v-close-popup />
-      <q-btn label="Enviar" color="primary" @click="sendEmail(currentTemplate, destinatario)" />
+      <q-btn
+        label="Enviar"
+        color="primary"
+        @click="sendEmail(currentTemplate, destinatario)"
+      />
     </q-card-actions>
   </q-card>
 </q-dialog>
+
 
 
     <!-- Dialog visualizar -->
@@ -207,7 +252,7 @@ const dialog = ref(false)
 const sendDialog = ref(false)
 const previewDialog = ref(false)
 const editing = ref(false)
-const currentTemplate = ref({ id: null, title: '', content: '', tags: [], favorite: false })
+const currentTemplate = ref({ id: null, title: '', content: '', tags: [], favorite: false,  fixedRecipient: '', subjectMode: 'title', customSubject: '' })
 const variables = ref([])
 const filledVars = ref({})
 const previewHtml = ref('')
@@ -239,15 +284,52 @@ const displayedTemplates = computed(() => {
 })
 
 const columns = [
-  { name: 'title', label: 'Título', field: 'title' },
-  { name: 'actions', label: 'Ações', field: 'actions' }
+  { name: 'title', label: 'Título', field: 'title', align: 'center' },
+  { name: 'fixedRecipient', label: 'Destinatário fixo', field: 'fixedRecipient', align: 'center' },
+  { name: 'subjectMode', label: 'Assunto', field: row => row.subjectMode === 'custom' ? row.customSubject : row.title, align: 'center' },
+  { name: 'actions', label: 'Ações', field: 'actions', align: 'center' }
 ]
+
+
 
 function loadTemplates () {
   const key = `templates_${user.value.email}`
   const saved = JSON.parse(localStorage.getItem(key)) || []
-  // garantir que todos tenham campo favorite
-  templates.value = saved.map(t => ({ ...t, favorite: t.favorite || false }))
+  templates.value = saved.map(t => ({
+    ...t,
+    favorite: t.favorite ?? false,
+    subjectMode: t.subjectMode ?? 'title',
+    customSubject: t.customSubject ?? ''
+  }))
+}
+
+
+
+
+function openDialog () {
+  editing.value = false
+  currentTemplate.value = {
+    id: null,
+    title: '',
+    content: '',
+    tags: [],
+    favorite: false,
+    fixedRecipient: '',
+    subjectMode: 'title',   // default
+    customSubject: ''
+  }
+  dialog.value = true
+}
+
+
+function editTemplate (template) {
+  editing.value = true
+  currentTemplate.value = {
+    ...template,
+    subjectMode: template.subjectMode || 'title',
+    customSubject: template.customSubject || ''
+  }
+  dialog.value = true
 }
 
 function saveTemplates () {
@@ -255,22 +337,15 @@ function saveTemplates () {
   localStorage.setItem(key, JSON.stringify(templates.value))
 }
 
-function openDialog () {
-  editing.value = false
-  currentTemplate.value = { id: null, title: '', content: '', tags: [], favorite: false }
-  dialog.value = true
-}
-
-function editTemplate (template) {
-  editing.value = true
-  currentTemplate.value = { ...template }
-  dialog.value = true
-}
 
 function saveTemplate () {
+  console.log('Salvando template:', currentTemplate.value)
+
   if (editing.value) {
     const index = templates.value.findIndex(t => t.id === currentTemplate.value.id)
-    templates.value[index] = { ...currentTemplate.value }
+    if (index !== -1) {
+      templates.value[index] = { ...currentTemplate.value }
+    }
   } else {
     currentTemplate.value.id = Date.now()
     templates.value.push({ ...currentTemplate.value })
@@ -278,6 +353,9 @@ function saveTemplate () {
   saveTemplates()
   dialog.value = false
 }
+
+
+
 
 function deleteTemplate(id) {
   showConfirm('Excluir Template', 'Tem certeza que deseja excluir este template?', () => {
@@ -308,7 +386,12 @@ function toggleFavorite (template) {
 }
 
 function prepareSend (template) {
-  currentTemplate.value = { ...template }
+  currentTemplate.value = {
+    ...template,
+    subjectMode: template.subjectMode || 'title',
+    customSubject: template.customSubject || ''
+  }
+
   const regex = /\{\{(.*?)\}\}/g
   const matches = template.content.match(regex) || []
   variables.value = matches.map(v => v.replace('{{', '').replace('}}', '').trim())
@@ -316,6 +399,9 @@ function prepareSend (template) {
   variables.value.forEach(v => filledVars.value[v] = '')
   sendDialog.value = true
 }
+
+
+
 
 
 function preparePreview (template) {
@@ -371,77 +457,85 @@ onMounted(() => {
 
 
 
-async function sendEmail(template, destinatario) {
-  if (!destinatario) {
+async function sendEmail(template, destinatarioInput) {
+  const token = localStorage.getItem('google_token')
+  if (!token) {
+    showError('Você precisa se conectar ao Gmail primeiro')
+    return
+  }
+
+  const finalRecipient = destinatarioInput || template.fixedRecipient
+  if (!finalRecipient) {
     showError('Informe um destinatário')
     return
   }
 
-  const subject = assuntoEmail.value || template.title
+  let subject = template.title
+  if (template.subjectMode === 'custom') {
+    subject = assuntoEmail.value || template.customSubject || template.title
+  }
 
-  showConfirm('Enviar Email', `Deseja enviar "${subject}" para ${destinatario}?`, async () => {
-    try {
-      const token = localStorage.getItem('google_token')
-      if (!token) {
-        showError('Você precisa se conectar ao Gmail primeiro')
-        return
-      }
+  const rawMessage = [
+    `To: ${finalRecipient}`,
+    `Subject: ${subject}`,
+    "Content-Type: text/html; charset=UTF-8",
+    "",
+    previewHtml.value
+  ].join("\n")
 
-      const rawMessage = [
-        `To: ${destinatario}`,
-        `Subject: ${subject}`,
-        "Content-Type: text/html; charset=UTF-8",
-        "",
-        previewHtml.value
-      ].join("\n")
+  const encodedMessage = btoa(rawMessage)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
 
-      const encodedMessage = btoa(rawMessage)
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '')
+  try {
+    await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ raw: encodedMessage })
+    })
 
-      await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ raw: encodedMessage })
-      })
+    showSuccess(`Email enviado para ${finalRecipient}`)
+    finalSendDialog.value = false
 
-      showSuccess(`Email enviado para ${destinatario}`)
-      finalSendDialog.value = false
-
-      // salvar no histórico
-      const envio = {
-        id: Date.now(),
-        templateTitle: template.title,
-        assunto: subject,
-        destinatario,
-        data: new Date().toLocaleString()
-      }
-      historicoEnvios.value.push(envio)
-      localStorage.setItem(`historico_${user.value.email}`, JSON.stringify(historicoEnvios.value))
-    } catch (err) {
-      console.error('Erro ao enviar email:', err)
-      showError('Falha ao enviar email')
+    // salvar no histórico
+    const envio = {
+      id: Date.now(),
+      templateTitle: template.title,
+      assunto: subject,
+      destinatario: finalRecipient,
+      data: new Date().toLocaleString()
     }
-  })
+    historicoEnvios.value.push(envio)
+    localStorage.setItem(`historico_${user.value.email}`, JSON.stringify(historicoEnvios.value))
+  } catch (err) {
+    console.error('Erro ao enviar email:', err)
+    showError('Falha ao enviar email')
+  }
 }
 
+
 function openSendPreview() {
-  // monta preview substituindo variáveis
   let html = currentTemplate.value.content
   for (const key in filledVars.value) {
     const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g')
     html = html.replace(regex, filledVars.value[key])
   }
   previewHtml.value = html
+
+  console.log('Abrindo envio com:', currentTemplate.value)
+
+  if (currentTemplate.value.subjectMode === 'custom') {
+    assuntoEmail.value = currentTemplate.value.customSubject || ''
+  } else {
+    assuntoEmail.value = ''
+  }
+
   sendDialog.value = false
   finalSendDialog.value = true
 }
 
-
-
 </script>
-  
