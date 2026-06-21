@@ -22,15 +22,24 @@
       <!-- Integração da API do Gmail (Design Unificado) -->
       <div class="q-mb-lg">
         <q-btn 
-          label="Conectar com Google" 
-          icon="img:https://developers.google.com/static/identity/images/g-logo.png"
           color="white" 
           text-color="grey-7"
-          class="google-btn full-width text-weight-bold" 
+          class="google-btn full-width text-weight-bold"
           no-caps
           flat
-          @click="connectGmail" 
-        />
+          @click="connectGmail"
+        >
+          <div class="row items-center">
+            <div class="google-icon-container q-mr-sm">
+              <img
+                src="https://developers.google.com/static/identity/images/g-logo.png"
+                width="18"
+              />
+            </div>
+
+            <span>Conectar com Google</span>
+          </div>
+        </q-btn> 
       </div>
 
       <div class="row items-center q-mb-lg text-grey-5">
@@ -84,6 +93,19 @@
             flat 
             no-caps 
           />
+        </div>
+
+        <div class="text-center q-mt-md">
+          <span class="text-grey-6">
+            Não possui conta?
+          </span>
+
+          <a
+            href="#"
+            class="text-primary text-weight-bold q-ml-xs text-decoration-none"
+          >
+            Cadastrar-se
+          </a>
         </div>
       </q-form>
 
@@ -279,5 +301,21 @@ function handleLogin() {
 }
 .google-btn:hover {
   background: #e5e7eb !important;
+}
+
+.google-icon-container {
+  background: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-icon-container img {
+  display: block;
 }
 </style>
