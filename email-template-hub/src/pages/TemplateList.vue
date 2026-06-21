@@ -1,6 +1,5 @@
 <template>
-  <q-page class="q-pa-lg neumorphic-bg">
-    <!-- CABEÇALHO PRINCIPAL -->
+  <q-page class="q-pa-lg page-modern">    <!-- CABEÇALHO PRINCIPAL -->
     <div class="row items-center justify-between q-mb-xl">
       <!-- Lado Esquerdo: Título e Subtítulo -->
       <div>
@@ -9,7 +8,7 @@
       </div>
       
       <!-- Lado Direito: PÍLULA DE PERFIL AUTENTICADO -->
-      <div class="neu-profile-pill row items-center q-gutter-sm cursor-pointer">
+      <div class="profile-modern row items-center q-gutter-sm cursor-pointer">
         <!-- Avatar Redondo com a Inicial -->
         <q-avatar size="40px" color="primary" text-color="white" class="text-weight-bold shadow-1">
           {{ userInitial }}
@@ -26,7 +25,7 @@
         </div>
 
         <!-- Menu suspenso (Mantendo as funções de Logout) -->
-        <q-menu transition-show="jump-down" transition-hide="jump-up" class="neu-menu">
+        <q-menu transition-show="jump-down" transition-hide="jump-up" class="menu-modern">
           <q-list style="min-width: 240px" class="q-pa-sm">
             <q-item>
               <q-item-section avatar>
@@ -49,107 +48,89 @@
       </div>
     </div>
 
-    <!-- CONTROLES SUPERIORES (ABAS, BUSCA E ALTERNÂNCIA) -->
-    <div class="row items-center justify-between q-mb-xl q-col-gutter-md">
-      <!-- Lado Esquerdo: Ações Principais e Modos de Visão -->
-      <div class="col-12 col-md-auto row q-gutter-md items-center">
-        <q-btn 
-          label="Novo Template" 
-          color="primary" 
-          icon="add" 
-          class="neu-btn text-weight-bold" 
-          no-caps
-          flat
-          @click="openDialog()" 
-        />
-        <q-btn 
-          label="Mudar de Nicho" 
-          color="grey-8" 
-          icon="tune" 
-          class="neu-btn-secondary text-weight-medium" 
-          no-caps
-          flat
-          @click="showOnboarding = true" 
-        >
-          <q-tooltip class="bg-primary text-body2">Escolher outro nicho profissional e recarregar modelos</q-tooltip>
-        </q-btn>
+    <!-- CONTROLES SUPERIORES -->
+<div class="row items-center justify-between q-mb-xl q-col-gutter-md">
 
-        <!-- Só exibe alternância de layout se não estiver na aba de histórico -->
-        <div v-if="tab !== 'history'" class="neu-toggle-group row q-gutter-xs q-pa-xs">
-          <q-btn 
-            flat 
-            round 
-            dense 
-            icon="list" 
-            :class="viewMode === 'table' ? 'neu-toggle-active' : 'neu-toggle-inactive'"
-            @click="viewMode = 'table'"
-          >
-            <q-tooltip>Visualização em Tabela</q-tooltip>
-          </q-btn>
-          <q-btn 
-            flat 
-            round 
-            dense 
-            icon="grid_view" 
-            :class="viewMode === 'grid' ? 'neu-toggle-active' : 'neu-toggle-inactive'"
-            @click="viewMode = 'grid'"
-          >
-            <q-tooltip>Visualização em Cards</q-tooltip>
-          </q-btn>
-        </div>
-      </div>
+  <!-- Lado Esquerdo: Abas + Alternância -->
+  <div class="col-12 col-md-auto row items-center q-gutter-md">
+    <q-tabs v-model="tab" class="tabs-modern text-primary" active-color="primary" indicator-color="transparent">
+      <q-tab name="all" label="Todos" icon="list" no-caps class="tab-modern" />
+      <q-tab name="favorites" label="Favoritos" icon="star" no-caps class="tab-modern" />
+      <q-tab name="history" label="Histórico" icon="history" no-caps class="tab-modern" />
+    </q-tabs>
 
-      <!-- Lado Direito: Seleção de Abas e Busca -->
-      <div class="col-12 col-md-auto row items-center q-gutter-md justify-end">
-        <q-tabs v-model="tab" class="neu-tabs text-primary" active-color="primary" indicator-color="transparent">
-          <q-tab name="all" label="Todos" icon="list" no-caps class="neu-tab-item" />
-          <q-tab name="favorites" label="Favoritos" icon="star" no-caps class="neu-tab-item" />
-          <q-tab name="history" label="Histórico" icon="history" no-caps class="neu-tab-item" />
-        </q-tabs>
-
-        <q-input 
-          v-model="search" 
-          placeholder="Buscar template..." 
-          borderless
-          dense 
-          style="min-width: 250px"
-          class="neu-input q-px-md"
-        >
-          <template v-slot:append>
-            <q-icon name="search" color="primary" />
-          </template>
-        </q-input>
-      </div>
+    <div v-if="tab !== 'history'" class="toggle-modern row q-gutter-xs q-pa-xs">
+      <q-btn flat round dense icon="list"
+        :class="viewMode === 'table' ? 'toggle-active-modern' : 'toggle-inactive-modern'"
+        @click="viewMode = 'table'" />
+      <q-btn flat round dense icon="grid_view"
+        :class="viewMode === 'grid' ? 'toggle-active-modern' : 'toggle-inactive-modern'"
+        @click="viewMode = 'grid'" />
     </div>
+  </div>
 
-    <!-- FILTRO POR CATEGORIAS (Escondido na aba de histórico) -->
-    <div class="row items-center q-mb-xl q-gutter-sm neu-card q-pa-md" v-if="allAvailableTags.length > 0 && tab !== 'history'">
-      <div class="text-caption text-grey-7 q-mr-sm text-weight-bold row items-center">
-        <q-icon name="filter_alt" size="xs" class="q-mr-xs" color="primary" /> CATEGORIAS:
-      </div>
-      
-      <q-chip 
-        clickable 
-        :class="selectedTags.length === 0 ? 'neu-chip-active' : 'neu-chip'" 
-        color="transparent"
-        dense
-        @click="selectedTags = []"
-      >
-        Todas
-      </q-chip>
+  <!-- Lado Direito: Botões principais -->
+  <div class="col-12 col-md-auto row justify-end q-gutter-sm">
+    <q-btn 
+      label="Novo Template" 
+      icon="add" 
+      class="btn-primary-modern text-weight-bold"
+      no-caps
+      @click="openDialog()" 
+    />
+    <q-btn 
+      label="Mudar de Nicho" 
+      icon="tune" 
+      class="btn-secondary-modern text-weight-medium"
+      no-caps
+      @click="showOnboarding = true" 
+    />
+  </div>
+</div>
 
-      <q-chip 
-        v-for="tag in allAvailableTags" 
-        :key="tag"
-        clickable 
-        :class="selectedTags.includes(tag) ? 'neu-chip-active' : 'neu-chip'"
-        color="transparent"
-        dense
-        @click="toggleTagFilter(tag)"
-      >
-        {{ tag }}
-      </q-chip>
+<!-- FILTROS: Toolbar flutuante -->
+<div class="filter-toolbar" v-if="allAvailableTags.length > 0 && tab !== 'history'">
+  
+  <!-- Busca -->
+  <q-input 
+    v-model="search" 
+    placeholder="Buscar template..." 
+    dense 
+    class="input-modern q-px-md"
+  >
+    <template v-slot:append>
+      <q-icon name="search" color="primary" />
+    </template>
+  </q-input>
+
+  <!-- Categorias -->
+  <div class="categories">
+    <div class="text-caption row items-center">
+      <q-icon name="filter_alt" size="xs" class="q-mr-xs" color="primary" /> CATEGORIAS:
     </div>
+    
+    <q-chip 
+      clickable 
+      :class="selectedTags.length === 0 ? 'chip-active-modern' : 'chip-modern'" 
+      dense
+      @click="selectedTags = []"
+    >
+      Todas
+    </q-chip>
+
+    <q-chip 
+      v-for="tag in allAvailableTags" 
+      :key="tag"
+      clickable 
+      :class="selectedTags.includes(tag) ? 'chip-active-modern' : 'chip-modern'"
+      dense
+      @click="toggleTagFilter(tag)"
+    >
+      {{ tag }}
+    </q-chip>
+  </div>
+</div>
+
 
     <!-- VISUALIZAÇÃO DOS CONTEÚDOS BASEADO NAS ABAS -->
     
@@ -160,7 +141,7 @@
         :columns="historyColumns"
         row-key="id"
         flat
-        class="neu-table text-grey-9"
+        class="table-modern text-grey-9"
         :no-data-label="'Nenhum e-mail foi enviado ainda através da plataforma.'"
       />
     </div>
@@ -172,14 +153,14 @@
         :columns="columns"
         row-key="id"
         flat
-        class="neu-table text-grey-9"
+        class="table-modern text-grey-9"
         :no-data-label="'Nenhum template encontrado com os filtros aplicados.'"
       >
         <template v-slot:body-cell-title="props">
           <q-td class="q-py-md">
             <div class="text-subtitle1 text-bold text-primary q-mb-xs">{{ props.row.title }}</div>
             <div class="row q-gutter-xs">
-              <q-chip v-for="tag in props.row.tags" :key="tag" class="neu-inner-chip" dense>
+              <q-chip v-for="tag in props.row.tags" :key="tag" class="chip-modern" dense>
                 {{ tag }}
               </q-chip>
             </div>
@@ -188,12 +169,12 @@
 
         <template v-slot:body-cell-actions="props">
           <q-td class="text-right q-gutter-sm">
-            <q-btn dense flat round icon="edit" color="primary" class="neu-action-btn" @click="editTemplate(props.row)"><q-tooltip>Editar Modelo</q-tooltip></q-btn>
-            <q-btn dense flat round icon="content_copy" color="info" class="neu-action-btn" @click="duplicateTemplate(props.row)"><q-tooltip>Duplicar Modelo</q-tooltip></q-btn>
-            <q-btn dense flat round icon="send" color="secondary" class="neu-action-btn" @click="prepareSend(props.row)"><q-tooltip>Preencher e Enviar</q-tooltip></q-btn>
-            <q-btn dense flat round icon="visibility" color="accent" class="neu-action-btn" @click="preparePreview(props.row)"><q-tooltip>Visualizar Prévia</q-tooltip></q-btn>
-            <q-btn dense flat round :icon="props.row.favorite ? 'star' : 'star_border'" :color="props.row.favorite ? 'warning' : 'grey-5'" class="neu-action-btn" @click="toggleFavorite(props.row)"><q-tooltip>Favorito</q-tooltip></q-btn>
-            <q-btn dense flat round icon="delete" color="negative" class="neu-action-btn" @click="confirmDelete(props.row)"><q-tooltip>Excluir Modelo</q-tooltip></q-btn>
+            <q-btn dense flat round icon="edit" color="primary" class="btn-modern" @click="editTemplate(props.row)"><q-tooltip>Editar Modelo</q-tooltip></q-btn>
+            <q-btn dense flat round icon="content_copy" color="info" class="btn-modern" @click="duplicateTemplate(props.row)"><q-tooltip>Duplicar Modelo</q-tooltip></q-btn>
+            <q-btn dense flat round icon="send" color="secondary" class="btn-modern" @click="prepareSend(props.row)"><q-tooltip>Preencher e Enviar</q-tooltip></q-btn>
+            <q-btn dense flat round icon="visibility" color="accent" class="btn-modern" @click="preparePreview(props.row)"><q-tooltip>Visualizar Prévia</q-tooltip></q-btn>
+            <q-btn dense flat round :icon="props.row.favorite ? 'star' : 'star_border'" :color="props.row.favorite ? 'warning' : 'grey-5'" class="btn-modern" @click="toggleFavorite(props.row)"><q-tooltip>Favorito</q-tooltip></q-btn>
+            <q-btn dense flat round icon="delete" color="negative" class="btn-modern" @click="confirmDelete(props.row)"><q-tooltip>Excluir Modelo</q-tooltip></q-btn>
           </q-td>
         </template>
       </q-table>
@@ -201,7 +182,7 @@
 
     <!-- MODO 2: CARDS GRID VIEW NEUMÓRFICO -->
     <div v-else class="row q-col-gutter-lg">
-      <div v-if="displayedTemplates.length === 0" class="col-12 text-center q-pa-xl text-grey-6 neu-card">
+      <div v-if="displayedTemplates.length === 0" class="col-12 text-center q-pa-xl text-grey-6 card-modern">
         Nenhum template encontrado com os filtros aplicados.
       </div>
       
@@ -210,7 +191,7 @@
         :key="template.id" 
         class="col-12 col-sm-6 col-md-4"
       >
-        <q-card flat class="neu-template-card full-height flex flex-column justify-between">
+        <q-card flat class="card-modern full-height flex flex-column justify-between">
           <q-card-section>
             <div class="row items-start justify-between no-wrap">
               <div class="text-subtitle1 text-bold text-primary q-pr-sm line-clamp">{{ template.title }}</div>
@@ -220,27 +201,27 @@
                 dense 
                 :icon="template.favorite ? 'star' : 'star_border'" 
                 :color="template.favorite ? 'warning' : 'grey-4'" 
-                class="neu-action-btn"
+                class="btn-modern"
                 @click="toggleFavorite(template)"
               />
             </div>
             
             <div class="row q-gutter-xs q-mt-xs">
-              <q-chip v-for="tag in template.tags" :key="tag" class="neu-inner-chip" dense>
+              <q-chip v-for="tag in template.tags" :key="tag" class="chip-modern" dense>
                 {{ tag }}
               </q-chip>
             </div>
 
-            <div class="text-body2 text-grey-7 q-mt-md content-preview neu-inset-preview q-pa-sm" v-html="template.content" />
+            <div class="text-body2 text-grey-7 q-mt-md content-preview preview-box q-pa-sm" v-html="template.content" />
           </q-card-section>
 
           <q-card-actions align="right" class="q-pa-md q-gutter-xs">
-            <q-btn dense flat round icon="edit" color="primary" class="neu-action-btn" @click="editTemplate(template)"><q-tooltip>Editar</q-tooltip></q-btn>
-            <q-btn dense flat round icon="content_copy" color="info" class="neu-action-btn" @click="duplicateTemplate(template)"><q-tooltip>Duplicar</q-tooltip></q-btn>
-            <q-btn dense flat round icon="visibility" color="accent" class="neu-action-btn" @click="preparePreview(template)"><q-tooltip>Visualizar</q-tooltip></q-btn>
-            <q-btn dense flat round icon="delete" color="negative" class="neu-action-btn" @click="confirmDelete(template)"><q-tooltip>Excluir</q-tooltip></q-btn>
+            <q-btn dense flat round icon="edit" color="primary" class="btn-modern" @click="editTemplate(template)"><q-tooltip>Editar</q-tooltip></q-btn>
+            <q-btn dense flat round icon="content_copy" color="info" class="btn-modern" @click="duplicateTemplate(template)"><q-tooltip>Duplicar</q-tooltip></q-btn>
+            <q-btn dense flat round icon="visibility" color="accent" class="btn-modern" @click="preparePreview(template)"><q-tooltip>Visualizar</q-tooltip></q-btn>
+            <q-btn dense flat round icon="delete" color="negative" class="btn-modern" @click="confirmDelete(template)"><q-tooltip>Excluir</q-tooltip></q-btn>
             
-            <q-btn label="Enviar" icon="send" color="secondary" size="sm" class="neu-btn q-px-sm text-weight-bold" flat @click="prepareSend(template)" />
+            <q-btn label="Enviar" icon="send" color="secondary" size="sm" class="btn-modern q-px-sm text-weight-bold" flat @click="prepareSend(template)" />
           </q-card-actions>
         </q-card>
       </div>
@@ -248,7 +229,7 @@
 
     <!-- MODAL DE SELEÇÃO DE NICHO (ONBOARDING COM GLASSMORPHISM) -->
     <q-dialog v-model="showOnboarding" persistent>
-      <q-card style="width: 650px; max-width: 90vw;" class="neu-dialog q-pa-md">
+      <q-card style="width: 650px; max-width: 90vw;" class="dialog-modern q-pa-md">
         <q-card-section class="text-center q-pb-none">
           <div class="text-h5 text-weight-bold text-primary">Seja bem-vindo!</div>
           <div class="text-subtitle1 text-grey-7 q-mt-sm">
@@ -258,7 +239,7 @@
 
         <q-card-section class="row q-col-gutter-lg justify-center q-mt-md">
           <div class="col-12 col-sm-6" v-for="(item, key) in nichosInfo" :key="key">
-            <q-card flat class="neu-template-card text-center q-pa-md cursor-pointer" @click="handleNichoSelection(key)">
+            <q-card flat class="card-modern text-center q-pa-md cursor-pointer" @click="handleNichoSelection(key)">
               <q-icon :name="item.icon" size="lg" color="primary" />
               <div class="text-h6 q-mt-sm text-weight-bold">{{ item.title }}</div>
               <div class="text-caption text-grey-6">{{ item.desc }}</div>
@@ -267,20 +248,20 @@
         </q-card-section>
         
         <q-card-actions align="center" v-if="templates.length > 0" class="q-mt-sm">
-          <q-btn flat label="Cancelar e Manter Atuais" color="grey-7" class="neu-btn-secondary" v-close-popup no-caps />
+          <q-btn flat label="Cancelar e Manter Atuais" color="grey-7" class="btn-secondary-modern" v-close-popup no-caps />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- MODAL CRIAR / EDITAR TEMPLATE -->
     <q-dialog v-model="dialog">
-      <q-card style="min-width: 650px" class="neu-dialog q-pa-md">
+      <q-card style="min-width: 650px" class="dialog-modern q-pa-md">
         <q-card-section>
           <div class="text-h6 text-primary text-weight-bold">{{ editing ? 'Editar Template' : 'Novo Template' }}</div>
         </q-card-section>
 
         <q-card-section>
-          <q-input v-model="currentTemplate.title" placeholder="Título do Template" borderless class="neu-input q-px-md q-mb-md" />
+          <q-input v-model="currentTemplate.title" placeholder="Título do Template"  class="input-modern q-px-md q-mb-md" />
 
           <q-select
             v-model="currentTemplate.tags"
@@ -289,10 +270,10 @@
             multiple
             use-chips
             borderless
-            class="neu-input q-px-md q-mb-md"
+            class="input-modern q-px-md q-mb-md"
           />
 
-          <q-input v-model="currentTemplate.fixedRecipient" placeholder="Destinatário fixo (opcional)" borderless class="neu-input q-px-md q-mb-md" />
+          <q-input v-model="currentTemplate.fixedRecipient" placeholder="Destinatário fixo (opcional)" borderless class="input-modern q-px-md q-mb-md" />
           
           <q-select
             v-model="currentTemplate.subjectMode"
@@ -305,7 +286,7 @@
             emit-value
             map-options
             borderless
-            class="neu-input q-px-md q-mb-md"
+            class="input-modern q-px-md q-mb-md"
           />           
 
           <q-input
@@ -313,36 +294,36 @@
             v-model="currentTemplate.customSubject"
             placeholder="Assunto personalizado"
             borderless
-            class="neu-input q-px-md q-mb-md"
+            class="input-modern q-px-md q-mb-md"
           />
 
           <div class="row q-gutter-sm q-mb-md">
-            <q-chip clickable class="neu-chip" @click="insertVariable('email')"><q-icon name="email" class="q-mr-xs" color="primary"/>Email</q-chip>
-            <q-chip clickable class="neu-chip" @click="insertVariable('data')"><q-icon name="event" class="q-mr-xs" color="secondary"/>Data</q-chip>
-            <q-chip clickable class="neu-chip" @click="insertVariable('person')"><q-icon name="person" class="q-mr-xs" color="accent"/>Pessoa</q-chip>
-            <q-chip clickable class="neu-chip" @click="insertVariable('telefone')"><q-icon name="phone" class="q-mr-xs" color="teal"/>Telefone</q-chip>
+            <q-chip clickable class="chip-modern" @click="insertVariable('email')"><q-icon name="email" class="q-mr-xs" color="primary"/>Email</q-chip>
+            <q-chip clickable class="chip-modern" @click="insertVariable('data')"><q-icon name="event" class="q-mr-xs" color="secondary"/>Data</q-chip>
+            <q-chip clickable class="chip-modern" @click="insertVariable('person')"><q-icon name="person" class="q-mr-xs" color="accent"/>Pessoa</q-chip>
+            <q-chip clickable class="chip-modern" @click="insertVariable('telefone')"><q-icon name="phone" class="q-mr-xs" color="teal"/>Telefone</q-chip>
           </div>
 
           <q-editor
             v-model="currentTemplate.content"
             label="Conteúdo"
             height="220px"
-            class="neu-editor"
+            class="editor-modern"
             placeholder="Monte seu template aqui"
             flat
           />
         </q-card-section>
 
         <q-card-actions align="right" class="q-gutter-sm">
-          <q-btn flat label="Cancelar" class="neu-btn-secondary" v-close-popup />
-          <q-btn flat label="Salvar" color="primary" class="neu-btn" @click="saveTemplate" />
+          <q-btn flat label="Cancelar" class="btn-secondary-modern" v-close-popup />
+          <q-btn flat label="Salvar" color="primary" class="btn-modern" @click="saveTemplate" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- DIALOG: PREENCHER VARIÁVEIS -->
     <q-dialog v-model="sendDialog">
-      <q-card style="min-width: 600px" class="neu-dialog q-pa-md">
+      <q-card style="min-width: 600px" class="dialog-modern q-pa-md">
         <q-card-section>
           <div class="text-h6 text-primary text-weight-bold">Preencher variáveis</div>
         </q-card-section>
@@ -350,20 +331,20 @@
         <q-card-section>
           <div v-for="variable in variables" :key="variable" class="q-mb-md">
             <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">{{ variable.toUpperCase() }}</div>
-            <q-input v-model="filledVars[variable]" borderless class="neu-input q-px-md" />
+            <q-input v-model="filledVars[variable]" borderless class="input-modern q-px-md" />
           </div>
         </q-card-section>
 
         <q-card-actions align="right" class="q-gutter-sm">
-          <q-btn flat label="Cancelar" class="neu-btn-secondary" v-close-popup />
-          <q-btn flat label="Próximo" color="primary" class="neu-btn" @click="openSendPreview()" />
+          <q-btn flat label="Cancelar" class="btn-secondary-modern" v-close-popup />
+          <q-btn flat label="Próximo" color="primary" class="btn-modern" @click="openSendPreview()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- DIALOG: CONFIRMAÇÃO DE ENVIO REAL (GMAIL INTEGRADO) -->
     <q-dialog v-model="finalSendDialog">
-      <q-card style="min-width: 600px" class="neu-dialog q-pa-md">
+      <q-card style="min-width: 600px" class="dialog-modern q-pa-md">
         <q-card-section>
           <div class="text-h6 text-primary text-weight-bold">Enviar Email</div>
         </q-card-section>
@@ -371,49 +352,49 @@
         <q-card-section>
           <div v-if="!currentTemplate.fixedRecipient" class="q-mb-md">
             <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">DESTINATÁRIO</div>
-            <q-input v-model="destinatario" borderless class="neu-input q-px-md" />
+            <q-input v-model="destinatario" borderless class="input-modern q-px-md" />
           </div>
 
           <div v-if="currentTemplate.subjectMode === 'custom'" class="q-mb-md">
             <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">ASSUNTO PERSONALIZADO</div>
-            <q-input v-model="assuntoEmail" borderless class="neu-input q-px-md" />
+            <q-input v-model="assuntoEmail" borderless class="input-modern q-px-md" />
           </div>
 
           <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">PRÉVIA DO CORPO DO E-MAIL</div>
-          <div v-html="previewHtml" class="neu-inset-preview-large q-pa-md bg-white" style="min-height:200px; max-height: 400px; overflow-y: auto;" />
+          <div v-html="previewHtml" class="preview-box" />
         </q-card-section>
 
         <q-card-actions align="right" class="q-gutter-sm">
-          <q-btn flat label="Cancelar" class="neu-btn-secondary" v-close-popup />
-          <q-btn flat label="Enviar Agora" color="primary" class="neu-btn" @click="sendEmail(currentTemplate, destinatario)" />
+          <q-btn flat label="Cancelar" class="btn-secondary-modern" v-close-popup />
+          <q-btn flat label="Enviar Agora" color="primary" class="btn-modern" @click="sendEmail(currentTemplate, destinatario)" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- DIALOG VISUALIZAR E EXTRAIR (PREVIEW COMPLETO) -->
     <q-dialog v-model="previewDialog" maximized>
-      <q-card class="neumorphic-bg q-pa-lg">
+      <q-card class="page-modern q-pa-lg">
         <q-card-section class="row items-center justify-between">
           <div class="text-h6 text-primary text-weight-bold">Visualização do Template</div>
-          <q-btn flat round icon="close" class="neu-action-btn" v-close-popup />
+          <q-btn flat round icon="close" class="btn-modern" v-close-popup />
         </q-card-section>
 
         <q-card-section class="row q-col-gutter-lg">
           <div class="col-12 col-md-4">
-            <div class="neu-card q-pa-md">
+            <div class="card-modern q-pa-md">
               <div class="text-subtitle2 text-primary q-mb-md text-weight-bold">Variáveis dinâmicas</div>
               <div v-for="variable in variables" :key="variable" class="q-mb-md">
                 <div class="text-caption text-grey-7 q-mb-xs text-weight-bold">{{ variable }}</div>
-                <q-input v-model="filledVars[variable]" borderless class="neu-input q-px-md" @update:model-value="updatePreview" />
+                <q-input v-model="filledVars[variable]" borderless class="input-modern q-px-md" @update:model-value="updatePreview" />
               </div>
             </div>
           </div>
           
           <div class="col-12 col-md-8">
-            <div v-html="previewHtml" class="neu-inset-preview-large q-pa-xl bg-white" style="min-height:500px;" />
+            <div v-html="previewHtml" class="preview-box q-pa-xl bg-white" style="min-height:500px;" />
             <div class="row justify-end q-mt-lg q-gutter-sm">
-              <q-btn flat label="Copiar Código HTML" color="info" class="neu-btn" icon="content_copy" @click="exportHtml" />
-              <q-btn flat label="Baixar PDF" color="primary" class="neu-btn" icon="download" @click="downloadPdf" />
+              <q-btn flat label="Copiar Código HTML" color="info" class="btn-modern" icon="content_copy" @click="exportHtml" />
+              <q-btn flat label="Baixar PDF" color="primary" class="btn-modern" icon="download" @click="downloadPdf" />
             </div>
           </div>
         </q-card-section>
@@ -793,202 +774,230 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* AMBIENTE GLOBAL NEUMÓRFICO */
-.neumorphic-bg {
-  background-color: #e0e8ef !important;
+/* Fonte e fundo global */
+body, .q-page, .page-modern {
+  font-family: 'Inter', 'Poppins', sans-serif !important;
+  background: #f9fafb !important;
+  color: #1f2937 !important;
 }
 
+/* Cabeçalhos e títulos */
 .brand-title {
-  letter-spacing: -1px;
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: #111827;
 }
 
-/* 1. CARDS SOFT UI (凸 ELEVADO) */
-.neu-card, .neu-template-card {
-  background: #e0e8ef;
-  border-radius: 16px;
-  border: none !important;
-  box-shadow: 9px 9px 16px rgba(190, 204, 216, 0.5), -9px -9px 16px #ffffff;
-  transition: all 0.3s ease;
-}
-
-/* CARDS INTERNOS DO ONBOARDING REVISADOS */
-.neu-template-card {
-  background: #e0e8ef !important; 
-  box-shadow: 5px 5px 12px rgba(160, 175, 190, 0.4), -5px -5px 12px #ffffff;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.neu-template-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 10px 14px 24px rgba(160, 175, 190, 0.5), -8px -8px 20px #ffffff;
-}
-
-/* 2. COMPONENTES EMBAIXADOS (凹 INSET) */
-.neu-inset-preview {
-  background: #e0e8ef;
-  border-radius: 12px;
-  box-shadow: inset 4px 4px 8px #beccd8, inset -4px -4px 8px #ffffff;
-  overflow: hidden;
-  min-height: 80px;
-}
-.neu-inset-preview-large {
-  background: #f0f4f8;
-  border-radius: 20px;
-  box-shadow: inset 6px 6px 12px #beccd8, inset -6px -6px 12px #ffffff;
-  border: none;
-}
-
-/* 3. BOTÕES NEUMÓRFICOS CLÁSSICOS */
-.neu-btn {
-  background: #e0e8ef !important;
+/* Cards */
+.card-modern, .q-card {
+  background: #ffffff !important;
   border-radius: 12px !important;
-  color: var(--q-primary) !important;
-  box-shadow: 5px 5px 10px #beccd8, -5px -5px 10px #ffffff !important;
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+  transition: transform 0.2s ease;
 }
-.neu-btn:active {
-  box-shadow: inset 3px 3px 6px #beccd8, inset -3px -3px 6px #ffffff !important;
+.card-modern:hover, .q-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
-.neu-btn-secondary {
-  background: #e0e8ef !important;
-  border-radius: 12px !important;
-  color: #55606d !important;
-  box-shadow: 5px 5px 10px #beccd8, -5px -5px 10px #ffffff !important;
+
+/* Botões */
+.btn-modern, .q-btn {
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
-.neu-btn-secondary:active {
-  box-shadow: inset 3px 3px 6px #beccd8, inset -3px -3px 6px #ffffff !important;
+.q-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
-.neu-btn-round {
-  background: #e0e8ef !important;
-  box-shadow: 4px 4px 8px #beccd8, -4px -4px 8px #ffffff !important;
+.btn-secondary-modern {
+  border-radius: 8px !important;
+  color: #374151 !important;
 }
-.neu-action-btn {
-  background: #e0e8ef !important;
-  box-shadow: 3px 3px 6px #beccd8, -3px -3px 6px #ffffff !important;
+
+/* Inputs */
+.input-modern, .q-input {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 6px 10px !important;
+  font-size: 14px !important;
+  color: #1f2937 !important;
+}
+.q-field__label {
+  font-weight: 500;
+  color: #6b7280 !important;
+}
+.input-modern:focus-within, .q-input:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15) !important;
+}
+
+/* Chips */
+.chip-modern, .q-chip {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
   margin: 2px;
 }
-.neu-action-btn:active {
-  box-shadow: inset 2px 2px 4px #beccd8, inset -2px -2px 4px #ffffff !important;
+.chip-active-modern {
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
 }
 
-/* PÍLULA DE PERFIL NEUMÓRFICA DINÂMICA */
-.neu-profile-pill {
-  background: #e0e8ef;
-  padding: 6px 14px 6px 6px;
-  border-radius: 30px;
-  box-shadow: 4px 4px 10px #beccd8, -4px -4px 10px #ffffff;
-  transition: all 0.2s ease;
+/* Tabs */
+.tabs-modern, .q-tabs {
+  background: transparent !important;
+  border-bottom: 1px solid #e5e7eb !important;
 }
-.neu-profile-pill:hover {
-  box-shadow: 6px 6px 14px #beccd8, -6px -6px 14px #ffffff;
-  transform: translateY(-1px);
+.tab-modern, .q-tab {
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.2s ease;
 }
-
-/* 4. ENTRADAS DE TEXTO (INPUTS) */
-.neu-input {
-  background: #e0e8ef !important;
-  border-radius: 12px !important;
-  box-shadow: inset 4px 4px 8px #beccd8, inset -4px -4px 8px #ffffff !important;
+.tab-modern.q-tab--active, .q-tab.q-tab--active {
+  color: #2563eb !important;
+  border-bottom: 2px solid #2563eb !important;
 }
 
-/* 5. ABAS (TABS) E GRUPOS DE ALTERNÂNCIA */
-.neu-tabs {
-  background: #e0e8ef;
-  border-radius: 14px;
-  padding: 4px;
-  box-shadow: 5px 5px 10px #beccd8, -5px -5px 10px #ffffff;
-}
-.neu-tab-item {
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-.neu-tabs .q-tab--active {
-  background: #e0e8ef;
-  box-shadow: inset 3px 3px 6px #beccd8, inset -3px -3px 6px #ffffff;
-}
-.neu-toggle-group {
-  background: #e0e8ef;
-  border-radius: 12px;
-  box-shadow: inset 3px 3px 6px #beccd8, inset -3px -3px 6px #ffffff;
-}
-.neu-toggle-active {
-  background: #e0e8ef !important;
-  box-shadow: 3px 3px 6px #beccd8, -3px -3px 6px #ffffff !important;
-  color: var(--q-primary) !important;
-}
-.neu-toggle-inactive {
-  color: #a0acba !important;
-}
-
-/* 6. CHIPS E TAGS SELECIONÁVEIS */
-.neu-chip {
-  background: #e0e8ef !important;
-  box-shadow: 3px 3px 6px #beccd8, -3px -3px 6px #ffffff !important;
+/* Toggle */
+.toggle-modern {
+  background: #ffffff !important;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
-.neu-chip-active {
-  background: #e0e8ef !important;
-  box-shadow: inset 3px 3px 6px #beccd8, inset -3px -3px 6px #ffffff !important;
-  color: var(--q-primary) !important;
-  font-weight: bold;
+.toggle-active-modern {
+  color: #2563eb !important;
+  border-bottom: 2px solid #2563eb !important;
 }
-.neu-inner-chip {
-  background: #e0e8ef !important;
-  border: 1px solid #c8d4e0;
-  color: #495563;
+.toggle-inactive-modern {
+  color: #9ca3af !important;
 }
 
-/* 7. ELEMENTOS DE LISTAGEM E DIÁLOGOS REVISADOS (GLASSMORPHISM) */
-.neu-dialog {
-  background: rgba(224, 232, 239, 0.65) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 28px !important;
-  box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.08),
-    10px 10px 30px rgba(160, 175, 190, 0.2),
-    inset 1px 1px 0px rgba(255, 255, 255, 0.6) !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
-}
-
-.neu-table {
-  background: #e0e8ef !important;
-  border-radius: 16px !important;
-  box-shadow: 8px 8px 16px #beccd8, -8px -8px 16px #ffffff !important;
-  border: none !important;
-}
-.neu-table :deep(thead tr) {
-  background: #e0e8ef !important;
-}
-.neu-table :deep(th) {
-  font-weight: bold;
-  color: #495563;
-}
-
-.neu-editor {
-  background: #e0e8ef !important;
+/* Tabelas */
+.table-modern, .q-table {
   border-radius: 12px !important;
-  box-shadow: inset 4px 4px 8px #beccd8, inset -4px -4px 8px #ffffff !important;
-  border: none !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
 }
-.neu-menu {
-  background: #e0e8ef !important;
-  border-radius: 12px !important;
-  box-shadow: 5px 5px 15px #beccd8 !important;
+.table-modern th, .q-table th {
+  background: #f9fafb !important;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+  padding: 12px;
+}
+.table-modern td, .q-table td {
+  text-align: center;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.table-modern tbody tr:hover, .q-table tbody tr:hover {
+  background-color: #f0f9ff !important;
+  transition: background 0.2s ease-in-out;
 }
 
-/* AUXILIARES DE CORTE DE TEXTO */
-.content-preview {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Prévia do corpo do e-mail */
+.preview-box {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 16px !important;
+  min-height: 200px;
+  color: #1f2937 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
 }
-.line-clamp {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+
+/* Dialogs */
+.dialog-modern {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
+
+/* Profile pill */
+.profile-modern {
+  background: #ffffff !important;
+  border-radius: 30px;
+  padding: 6px 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Menus */
+.menu-modern {
+  background: #ffffff !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Editor */
+.editor-modern {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+}
+
+.btn-primary-modern {
+  border-radius: 8px !important;
+  background: #2563eb !important;   /* azul moderno */
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease-in-out;
+}
+.btn-primary-modern:hover {
+  background: #1e40af !important;   /* azul mais escuro no hover */
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3) !important;
+  transform: scale(1.05);
+}
+/* Toolbar de filtros (busca + categorias) */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff !important;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 5; /* fica acima do conteúdo */
+}
+
+/* Busca maior */
+.filter-toolbar .q-input {
+  flex: 1;
+  max-width: 600px;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Categorias à direita */
+.filter-toolbar .categories {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.filter-toolbar .categories .text-caption {
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-toolbar .q-chip {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.filter-toolbar .q-chip:hover {
+  transform: scale(1.05);
+}
+
 </style>

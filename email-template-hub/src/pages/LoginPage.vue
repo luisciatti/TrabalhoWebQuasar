@@ -13,7 +13,7 @@
       <!-- Logotipo / Ícone Central -->
       <div class="text-center q-mb-lg">
         <div class="mac-avatar-container flex flex-center q-mx-auto q-mb-sm">
-          <q-icon name="mail" size="md" color="primary" />
+          <q-icon name="mail" size="md"  />
         </div>
         <h2 class="text-h5 text-weight-bolder text-grey-9 q-my-none">MailDraft</h2>
         <p class="text-caption text-grey-6 q-mt-xs">Entre com as suas credenciais</p>
@@ -31,12 +31,6 @@
           flat
           @click="connectGmail" 
         />
-      </div>
-
-      <div class="row items-center q-mb-lg text-grey-5">
-        <q-separator class="col" />
-        <span class="q-px-sm text-caption text-weight-bold">OU</span>
-        <q-separator class="col" />
       </div>
 
       <div class="row items-center q-mb-lg text-grey-5">
@@ -177,106 +171,113 @@ function handleLogin() {
 </script>
 
 <style scoped>
-/* 1. FUNDO SÓLIDO (ESTILO MAC PRESTINE AZUL-PASTEL) */
+/* Fundo clean */
 .glass-login-bg {
-  background-color: #dbe7f2 !important;
+  background: #f9fafb !important;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 2. O CARD GLASSMORPHISM + NEUMORFISMO */
+/* Card moderno */
 .mac-login-card {
   width: 400px;
   max-width: 90vw;
-  padding: 30px 35px;
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow: 
-    0 4px 30px rgba(0, 0, 0, 0.04),
-    10px 10px 25px rgba(160, 175, 190, 0.2), 
-    -10px -10px 25px rgba(255, 255, 255, 0.6),
-    inset 1px 1px 0px rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 32px;
+  background: #ffffff !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* 3. WINDOW DOTS DO MAC */
+/* Window dots estilo Mac */
 .mac-window-dots .dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   display: inline-block;
 }
-.dot.close { background-color: #ff5f56; }
-.dot.minimize { background-color: #ffbd2e; }
-.dot.expand { background-color: #27c93f; }
+.dot.close { background-color: #ef4444; }
+.dot.minimize { background-color: #f59e0b; }
+.dot.expand { background-color: #10b981; }
 
-/* 4. RECEPTÁCULO DO AVATAR */
+/* Avatar */
 .mac-avatar-container {
   width: 70px;
   height: 70px;
-  background: rgba(255, 255, 255, 0.5);
   border-radius: 18px;
-  box-shadow: 
-    4px 4px 10px rgba(160, 175, 190, 0.15),
-    -4px -4px 10px rgba(255, 255, 255, 0.7),
-    inset 2px 2px 5px rgba(160, 175, 190, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
 }
 
-/* 5. ENTRADAS DE TEXTO ESTILO MACOS CACHED */
+/* Inputs */
 .mac-input {
-  background: rgba(255, 255, 255, 0.4) !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: inset 2px 2px 5px rgba(140, 155, 170, 0.15);
-  transition: all 0.25s ease;
-  font-size: 14px;
-}
-.mac-input:focus-within {
-  background: rgba(255, 255, 255, 0.7) !important;
-  border-color: var(--q-primary);
-  box-shadow: 
-    0 0 0 3px rgba(var(--q-primary-rgb), 0.15),
-    inset 1px 1px 2px rgba(140, 155, 170, 0.05);
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  font-size: 14px !important;
+  color: #1f2937 !important;
 }
 
-/* 6. BOTÃO PREMIUM DO MAC OS */
+/* Usa dense para reduzir altura */
+.mac-input.q-field--dense {
+  min-height: 38px !important;
+}
+
+/* Ajusta padding interno */
+.mac-input .q-field__native {
+  padding: 6px 10px !important;
+  min-height: 32px !important;
+}
+
+/* Label e ícone alinhados */
+.mac-input .q-field__label {
+  font-size: 12px !important;
+  color: #6b7280 !important;
+}
+.mac-input .q-icon {
+  font-size: 16px !important;
+  margin-right: 4px;
+}
+
+/* Foco */
+.mac-input:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15) !important;
+}
+
+
+/* Botão principal */
 .mac-btn {
-  background: var(--q-primary) !important;
-  color: white !important;
-  border-radius: 12px !important;
-  padding: 12px 0;
-  box-shadow: 
-    0 4px 12px rgba(var(--q-primary-rgb), 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 12px;
+  transition: all 0.2s ease-in-out;
 }
 .mac-btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(var(--q-primary-rgb), 0.4);
-}
-.mac-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(var(--q-primary-rgb), 0.3);
+  background: #1e40af !important;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  transform: scale(1.03);
 }
 
-/* 7. BOTÃO DO GOOGLE INTEGRADO AO NEUMORFISMO */
+/* Botão alternativo (Google) */
 .google-btn {
-  background: rgba(255, 255, 255, 0.5) !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 4px 4px 10px rgba(160, 175, 190, 0.1),
-              -4px -4px 10px rgba(255, 255, 255, 0.5);
-  transition: all 0.2s ease;
+  border-radius: 8px !important;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  padding: 12px;
+  transition: all 0.2s ease-in-out;
 }
 .google-btn:hover {
-  background: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 4px 4px 12px rgba(160, 175, 190, 0.15);
-}
-
-.text-decoration-none {
-  text-decoration: none;
+  background: #e5e7eb !important;
 }
 </style>
