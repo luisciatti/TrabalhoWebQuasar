@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
-          Email Template Hub
+          MailDraft
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
