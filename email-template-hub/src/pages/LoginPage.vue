@@ -58,13 +58,17 @@
             placeholder="nome@exemplo.com" 
             borderless 
             class="mac-input q-px-md"
-            :rules="[val => !!val || 'O e-mail é obrigatório']"
+            @blur="validateEmail(email)"
+            :class="{ 'input-error': emailError }"
             hide-bottom-space
           >
             <template v-slot:prepend>
               <q-icon name="alternate_email" size="xs" color="grey-6" />
             </template>
           </q-input>
+          <div v-if="emailError" class="error-message">
+            {{ emailError }}
+          </div>  
         </div>
 
         <div>
@@ -75,13 +79,17 @@
             placeholder="••••••••" 
             borderless 
             class="mac-input q-px-md"
-            :rules="[val => !!val || 'A senha é obrigatória']"
+            @blur="validatePassword(password)"
+            :class="{ 'input-error': passwordError }"
             hide-bottom-space
           >
             <template v-slot:prepend>
               <q-icon name="lock" size="xs" color="grey-6" />
             </template>
           </q-input>
+          <div v-if="passwordError" class="error-message">
+            {{ passwordError }}
+          </div>
         </div>
 
         <div class="q-mt-xl">
@@ -128,6 +136,27 @@ const $q = useQuasar()
 
 const email = ref('')
 const password = ref('')
+
+const emailError = ref('')
+const passwordError = ref('')
+
+const validateEmail = (val) => {
+  if (!val) {
+    emailError.value = 'O e-mail é obrigatório'
+    return false
+  }
+  emailError.value = ''
+  return true
+}
+
+const validatePassword = (val) => {
+  if (!val) {
+    passwordError.value = 'A senha é obrigatória'
+    return false
+  }
+  passwordError.value = ''
+  return true
+}
 
 const CLIENT_ID = '447644137186-hons62g4jdekbc6hps3pttuh7j21tukt.apps.googleusercontent.com'
 let tokenClient
@@ -317,5 +346,18 @@ function handleLogin() {
 
 .google-icon-container img {
   display: block;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
+  font-weight: 500;
+}
+
+.input-error {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
 }
 </style>
