@@ -66,8 +66,9 @@
               <q-icon name="alternate_email" size="xs" color="grey-6" />
             </template>
           </q-input>
-          <div v-if="emailError" class="error-message">
-            {{ emailError }}
+          <div v-if="emailError" class="error-container">
+            <q-icon name="error" size="xs" color="negative" />
+            <span class="error-message">{{ emailError }}</span>
           </div>  
         </div>
 
@@ -87,8 +88,9 @@
               <q-icon name="lock" size="xs" color="grey-6" />
             </template>
           </q-input>
-          <div v-if="passwordError" class="error-message">
-            {{ passwordError }}
+          <div v-if="passwordError" class="error-container">
+            <q-icon name="error" size="xs" color="negative" />
+            <span class="error-message">{{ passwordError }}</span>
           </div>
         </div>
 
