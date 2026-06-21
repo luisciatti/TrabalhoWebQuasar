@@ -1,1 +1,78 @@
-// app global css
+/* Fonte global */
+body, .q-page {
+  font-family: 'Inter', 'Poppins', sans-serif !important;
+  background: #f5f7fa !important; /* fundo suave */
+  color: #1f2937 !important;
+}
+
+/* Cards */
+.q-card {
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.q-card-section {
+  padding: 20px !important;
+}
+
+/* Tabelas */
+.q-table {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+/* Cabeçalhos */
+.q-table th {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  padding: 14px !important;
+  border-bottom: 2px solid #e5e7eb !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Linhas */
+.q-table td {
+  text-align: center !important;
+  padding: 12px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  color: #1f2937 !important;
+  font-size: 14px !important;
+}
+
+/* Hover nas linhas */
+.q-table tbody tr:hover {
+  background-color: #f0f9ff !important; /* azul claro */
+  transition: background 0.2s ease-in-out !important;
+  cursor: pointer;
+}
+
+/* Primeira coluna (título) com destaque */
+.q-table td:first-child {
+  font-weight: 600 !important;
+  color: #2563eb !important; /* azul moderno */
+}
+
+/* Botões */
+.q-btn {
+  border-radius: 8px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.q-btn:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+/* Chips */
+.q-chip {
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  margin: 2px !important;
+  background: #e0f2fe !important; /* azul suave */
+  color: #0369a1 !important;
+}
