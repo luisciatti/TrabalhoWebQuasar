@@ -1,6 +1,7 @@
 <template>
   <q-page class="q-pa-xl neumorphic-bg">
     
+    <!-- HEADER DA PÁGINA -->
     <div class="row items-end justify-between q-mb-xl">
       <div>
         <div class="text-h5 text-weight-bolder text-grey-9">Modelos de E-mail</div>
@@ -41,12 +42,37 @@
       </div>
     </div>
 
+    <!-- CONTROLES SECUNDÁRIOS: TABS, SELETOR DE VISUALIZAÇÃO E BUSCA -->
     <div class="row items-center justify-between q-mb-lg q-col-gutter-md">
       <div class="col-12 col-md-auto row items-center q-gutter-md">
         <q-tabs v-model="tab" class="neu-tabs text-primary" active-color="primary" indicator-color="transparent">
           <q-tab name="all" label="Todos os Modelos" icon="grid_view" no-caps class="neu-tab-item" />
           <q-tab name="favorites" label="Favoritos" icon="star" no-caps class="neu-tab-item" />
         </q-tabs>
+
+        <!-- SELETOR DE VISUALIZAÇÃO NEUMÓRFICO (GRID / TABELA) -->
+        <div class="neu-toggle-group row q-pa-xs items-center">
+          <q-btn 
+            flat 
+            round 
+            dense 
+            icon="grid_view" 
+            :class="viewMode === 'grid' ? 'neu-toggle-active' : 'neu-toggle-inactive'" 
+            @click="viewMode = 'grid'"
+          >
+            <q-tooltip>Visualização em Cards</q-tooltip>
+          </q-btn>
+          <q-btn 
+            flat 
+            round 
+            dense 
+            icon="list" 
+            :class="viewMode === 'table' ? 'neu-toggle-active' : 'neu-toggle-inactive'" 
+            @click="viewMode = 'table'"
+          >
+            <q-tooltip>Visualização em Tabela</q-tooltip>
+          </q-btn>
+        </div>
 
         <q-btn 
           label="Mudar de Nicho Profissional" 
@@ -76,7 +102,8 @@
       </div>
     </div>
 
-    <div class="row q-col-gutter-xl q-mt-xs">
+    <!-- MODO 1: VISUALIZAÇÃO EM GRID (CARDS NEUMÓRFICOS) -->
+    <div v-if="viewMode === 'grid'" class="row q-col-gutter-xl q-mt-xs">
       <div v-if="displayedTemplates.length === 0" class="col-12 text-center q-pa-xl text-grey-7 neu-card">
         Nenhum template encontrado nesta categoria.
       </div>
@@ -145,6 +172,54 @@
       </div>
     </div>
 
+    <!-- MODO 2: VISUALIZAÇÃO EM TABELA NEUMÓRFICA -->
+    <div v-else class="q-mt-md">
+      <div v-if="displayedTemplates.length === 0" class="text-center q-pa-xl text-grey-7 neu-card">
+        Nenhum template encontrado nesta categoria.
+      </div>
+      <q-table
+        v-else
+        :rows="displayedTemplates"
+        :columns="tableColumns"
+        row-key="id"
+        flat
+        class="neu-history-table text-grey-9"
+        :rows-per-page-options="[10, 20, 50]"
+      >
+        <template v-slot:body-cell-title="props">
+          <q-td :props="props" class="text-weight-bold text-grey-9">
+            {{ props.row.title }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-tags="props">
+          <q-td :props="props">
+            <div class="row q-gutter-xs">
+              <q-chip v-for="tag in props.row.tags" :key="tag" class="neu-inner-chip" dense>
+                {{ tag }}
+              </q-chip>
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props" align="right" class="q-gutter-xs">
+            <q-btn flat round dense icon="visibility" color="grey-7" size="sm" class="neu-action-btn" @click="preparePreview(props.row)">
+              <q-tooltip>Visualizar Prévia</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="edit" color="primary" size="sm" class="neu-action-btn" @click="editTemplate(props.row)">
+              <q-tooltip>Editar</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="send" color="secondary" size="sm" class="neu-action-btn" @click="prepareSend(props.row)">
+              <q-tooltip>Preencher & Enviar</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="delete" color="negative" size="sm" class="neu-action-btn" @click="confirmDelete(props.row)">
+              <q-tooltip>Excluir</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+
+    <!-- DIALOG: SELEÇÃO DE NICHO (ONBOARDING) -->
     <q-dialog v-model="showOnboarding" persistent>
       <q-card style="width: 650px; max-width: 90vw;" class="neu-dialog q-pa-md">
         <q-card-section class="text-center q-pb-none">
@@ -166,6 +241,7 @@
       </q-card>
     </q-dialog>
 
+    <!-- DIALOG: CRIAR / EDITAR TEMPLATE -->
     <q-dialog v-model="dialog">
       <q-card style="min-width: 650px" class="neu-dialog q-pa-md">
         <q-card-section><div class="text-h6 text-primary text-weight-bold">{{ editing ? 'Editar Template' : 'Novo Template' }}</div></q-card-section>
@@ -190,6 +266,7 @@
       </q-card>
     </q-dialog>
 
+    <!-- DIALOG: PREENCHER VARIÁVEIS -->
     <q-dialog v-model="sendDialog">
       <q-card style="min-width: 600px" class="neu-dialog q-pa-md">
         <q-card-section><div class="text-h6 text-primary text-weight-bold">Preencher variáveis</div></q-card-section>
@@ -206,6 +283,7 @@
       </q-card>
     </q-dialog>
 
+    <!-- DIALOG: CONFIRMAÇÃO DE ENVIO -->
     <q-dialog v-model="finalSendDialog">
       <q-card style="min-width: 600px" class="neu-dialog q-pa-md">
         <q-card-section><div class="text-h6 text-primary text-weight-bold">Enviar Email</div></q-card-section>
@@ -228,6 +306,7 @@
       </q-card>
     </q-dialog>
 
+    <!-- DIALOG: VISUALIZAR E EXTRAIR -->
     <q-dialog v-model="previewDialog" maximized>
       <q-card class="neumorphic-bg q-pa-lg">
         <q-card-section class="row items-center justify-between">
@@ -285,6 +364,17 @@ const showOnboarding = ref(false)
 const search = ref('')
 const tab = ref('all')
 const selectedTags = ref([])
+
+// ESTADO DE CONTROLE DE EXIBIÇÃO DA PÁGINA
+const viewMode = ref('grid') // Pode ser 'grid' (cards) ou 'table' (tabela)
+
+// MAPEAMENTO DE COLUNAS DA TABELA
+const tableColumns = [
+  { name: 'title', label: 'TÍTULO DO MODELO', field: 'title', align: 'left', sortable: true },
+  { name: 'tags', label: 'CATEGORIAS', field: 'tags', align: 'left' },
+  { name: 'fixedRecipient', label: 'DESTINATÁRIO FIXO', field: 'fixedRecipient', align: 'left' },
+  { name: 'actions', label: 'AÇÕES RÁPIDAS', field: 'id', align: 'right' }
+]
 
 const nichosInfo = {
   fotografia: { icon: 'camera_alt', title: 'Fotografia', desc: 'Orçamentos, entrega de fotos e contratos' },
@@ -598,6 +688,21 @@ onMounted(() => {
   box-shadow: 2px 2px 6px rgba(147, 162, 184, 0.25), -2px -2px 6px #ffffff;
 }
 
+/* SELETOR DE ALTERNÂNCIA DE VISUALIZAÇÃO NEUMÓRFICO */
+.neu-toggle-group {
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: inset 3px 3px 6px rgba(147, 162, 184, 0.3), inset -3px -3px 6px #ffffff;
+}
+.neu-toggle-active {
+  background: #ffffff !important;
+  box-shadow: 2px 2px 6px rgba(147, 162, 184, 0.25), -2px -2px 6px #ffffff !important;
+  color: #3ca0e8 !important;
+}
+.neu-toggle-inactive {
+  color: #94a3b8 !important;
+}
+
 /* 5. CHIPS */
 .neu-chip {
   background: #fafafa !important;
@@ -635,6 +740,25 @@ onMounted(() => {
   border-radius: 12px !important;
   box-shadow: inset 3px 3px 6px rgba(147, 162, 184, 0.3), inset -3px -3px 6px #ffffff !important;
   border: none !important;
+}
+
+/* ESTILIZAÇÃO NEUMÓRFICA DA TABELA DE MODELOS */
+.neu-history-table {
+  background: #fafafa !important;
+  border-radius: 16px !important;
+  box-shadow: 6px 6px 16px rgba(147, 162, 184, 0.6), -6px -6px 16px #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+}
+.neu-history-table :deep(thead tr) {
+  background: #fafafa !important;
+}
+.neu-history-table :deep(th) {
+  font-weight: bold;
+  color: #4a5568;
+  font-size: 13px;
+}
+.neu-history-table :deep(td) {
+  font-size: 13px;
 }
 
 .content-preview {
