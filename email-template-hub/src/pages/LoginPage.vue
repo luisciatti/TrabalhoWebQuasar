@@ -1,102 +1,108 @@
 <template>
-  <q-page class="flex flex-center glass-login-bg">
-    <!-- CARD DE LOGIN MAC (GLASSMORPHISM + NEUMORFISMO) -->
-    <div class="mac-login-card">
+  <q-page class="flex flex-center login-container-bg q-pa-md">
+    <div class="split-login-card row no-wrap shadow-4">
       
-      <!-- Detalhe decorativo estilo janela do Mac -->
-      <div class="mac-window-dots row q-gutter-xs q-mb-md">
-        <span class="dot close"></span>
-        <span class="dot minimize"></span>
-        <span class="dot expand"></span>
-      </div>
+      <div class="col-12 col-md-6 left-brand-panel flex flex-center gt-xs">
+        <div class="illustration-wrapper text-center q-pa-lg" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          
+          <div class="css-illustration relative-position">
+            <div class="mail-arch-door relative-position">
+              <div class="door-grid row q-col-gutter-xs q-pa-sm">
+                <div class="col-4" v-for="n in 6" :key="n">
+                  <div class="grid-box" />
+                </div>
+              </div>
+              <div class="door-handle" />
+            </div>
+            <div class="human-shadow" />
+            <div class="floor-line" />
+          </div>
 
-      <!-- Logotipo / Ícone Central -->
-      <div class="text-center q-mb-lg">
-        <div class="mac-avatar-container flex flex-center q-mx-auto q-mb-sm">
-          <q-icon name="mail" size="md" color="primary" />
+          <div class="text-h4 text-white text-weight-bolder q-mt-xl brand-text-split">MailHub</div>
+          <div class="text-subtitle2 text-blue-1 q-mt-xs">Seu hub inteligente de modelos de e-mail</div>
         </div>
-        <h2 class="text-h5 text-weight-bolder text-grey-9 q-my-none">MailDraft</h2>
-        <p class="text-caption text-grey-6 q-mt-xs">Entre com as suas credenciais</p>
       </div>
 
-      <!-- Integração da API do Gmail (Design Unificado) -->
-      <div class="q-mb-lg">
-        <q-btn 
-          label="Conectar com Google" 
-          icon="img:https://developers.google.com/static/identity/images/g-logo.png"
-          color="white" 
-          text-color="grey-7"
-          class="google-btn full-width text-weight-bold" 
-          no-caps
-          flat
-          @click="connectGmail" 
-        />
-      </div>
+      <div class="col-12 col-md-6 right-form-panel q-pa-xl" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+        <div class="text-h5 text-weight-bolder text-grey-8 text-center q-mb-xl uppercase-title">LOGIN</div>
 
-      <div class="row items-center q-mb-lg text-grey-5">
-        <q-separator class="col" />
-        <span class="q-px-sm text-caption text-weight-bold">OU</span>
-        <q-separator class="col" />
-      </div>
+        <q-form @submit.prevent="handleLogin" class="q-gutter-y-md" style="display: flex; flex-direction: column; width: 100%;">
+          <div style="width: 100%;">
+            <div class="text-caption text-weight-bold text-grey-7 q-mb-xs q-pl-xs">Username</div>
+            <q-input 
+              v-model="email" 
+              type="email" 
+              placeholder="@mail.com" 
+              outlined 
+              dense 
+              class="custom-split-input"
+              :rules="[val => !!val || 'O e-mail é obrigatório']"
+              hide-bottom-space
+            />
+          </div>
 
-      <div class="row items-center q-mb-lg text-grey-5">
-        <q-separator class="col" />
-        <span class="q-px-sm text-caption text-weight-bold">OU</span>
-        <q-separator class="col" />
-      </div>
+          <div style="width: 100%;" class="q-mt-md">
+            <div class="text-caption text-weight-bold text-grey-7 q-mb-xs q-pl-xs">Password</div>
+            <q-input 
+              v-model="password" 
+              type="password" 
+              placeholder="password" 
+              outlined 
+              dense 
+              class="custom-split-input"
+              :rules="[val => !!val || 'A senha é obrigatória']"
+              hide-bottom-space
+            />
+          </div>
 
-      <!-- Formulário de Login Tradicional -->
-      <q-form @submit.prevent="handleLogin" class="q-gutter-md">
-        <div>
-          <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">E-MAIL</div>
-          <q-input 
-            v-model="email" 
-            type="email" 
-            placeholder="nome@exemplo.com" 
-            borderless 
-            class="mac-input q-px-md"
-            :rules="[val => !!val || 'O e-mail é obrigatório']"
-            hide-bottom-space
-          >
-            <template v-slot:prepend>
-              <q-icon name="alternate_email" size="xs" color="grey-6" />
-            </template>
-          </q-input>
+          <div class="row items-center justify-between q-pt-sm" style="width: 100%;">
+            <q-checkbox v-model="rememberMe" label="Remember me" dense class="text-caption text-grey-6" />
+            <a href="#" class="text-caption text-primary text-weight-medium text-decoration-none">Esqueceu a Senha?</a>
+          </div>
+
+          <div class="q-mt-xl" style="width: 100%;">
+            <q-btn 
+              label="Entrar" 
+              type="submit" 
+              color="primary" 
+              unelevated
+              class="full-width text-weight-bold split-login-btn" 
+              no-caps 
+            />
+          </div>
+        </q-form>
+
+        <div class="text-center text-caption text-grey-6 q-mt-md" style="width: 100%;">
+          Não Tem Uma Conta? 
+          <span class="text-primary text-weight-bold cursor-pointer q-ml-xs" @click="router.push('/register')">
+            Inscrever-se
+          </span>
         </div>
 
-        <div>
-          <div class="text-caption text-grey-7 q-mb-xs q-pl-xs text-weight-bold">SENHA</div>
-          <q-input 
-            v-model="password" 
-            type="password" 
-            placeholder="••••••••" 
-            borderless 
-            class="mac-input q-px-md"
-            :rules="[val => !!val || 'A senha é obrigatória']"
-            hide-bottom-space
-          >
-            <template v-slot:prepend>
-              <q-icon name="lock" size="xs" color="grey-6" />
-            </template>
-          </q-input>
-        </div>
+        <div class="q-mt-xl" style="display: flex; flex-direction: column; width: 100%;">
+          <div class="row items-center q-mb-md text-grey-4" style="width: 100%;">
+            <q-separator class="col" />
+            <span class="q-px-sm text-caption text-grey-5 text-weight-bold">OU</span>
+            <q-separator class="col" />
+          </div>
 
-        <div class="q-mt-xl">
           <q-btn 
-            label="Iniciar Sessão" 
-            type="submit" 
-            color="primary" 
-            class="mac-btn full-width text-weight-bold" 
-            flat 
-            no-caps 
-          />
+            outline
+            color="grey-4"
+            text-color="grey-8"
+            class="full-width google-split-btn text-weight-bold"
+            no-caps
+            unelevated
+            @click="connectGmail"
+          >
+            <q-avatar size="20px" class="q-mr-sm">
+              <img src="https://developers.google.com/static/identity/images/g-logo.png" alt="Google">
+            </q-avatar>
+            <div class="text-subtitle2 text-weight-medium text-grey-7">Entrar com o Google</div>
+          </q-btn>
         </div>
-      </q-form>
 
-      <div class="text-center q-mt-lg">
-        <a href="#" class="text-caption text-primary text-weight-medium text-decoration-none">Esqueceu a sua senha?</a>
       </div>
-
     </div>
   </q-page>
 </template>
@@ -112,6 +118,7 @@ const $q = useQuasar()
 
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(false)
 
 const CLIENT_ID = '447644137186-hons62g4jdekbc6hps3pttuh7j21tukt.apps.googleusercontent.com'
 let tokenClient
@@ -141,8 +148,8 @@ onMounted(() => {
             showSuccess(`Conectado como ${userData.email}`)
             router.push('/templates')
           } catch (err) {
-            console.error('Erro ao buscar dados do usuário:', err)
-            showError('Não foi possível obter informações do usuário')
+            console.error('Erro ao buscar dados do utilizador:', err)
+            showError('Não foi possível obter informações do utilizador')
           }
         } else {
           showError('Falha ao autenticar com Gmail')
@@ -177,105 +184,122 @@ function handleLogin() {
 </script>
 
 <style scoped>
-/* 1. FUNDO SÓLIDO (ESTILO MAC PRESTINE AZUL-PASTEL) */
-.glass-login-bg {
-  background-color: #dbe7f2 !important;
+.login-container-bg {
+  background: #4fa8fa !important;
   min-height: 100vh;
 }
-
-/* 2. O CARD GLASSMORPHISM + NEUMORFISMO */
-.mac-login-card {
-  width: 400px;
-  max-width: 90vw;
-  padding: 30px 35px;
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow: 
-    0 4px 30px rgba(0, 0, 0, 0.04),
-    10px 10px 25px rgba(160, 175, 190, 0.2), 
-    -10px -10px 25px rgba(255, 255, 255, 0.6),
-    inset 1px 1px 0px rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+.split-login-card {
+  width: 900px;
+  max-width: 95vw;
+  height: 580px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
 }
-
-/* 3. WINDOW DOTS DO MAC */
-.mac-window-dots .dot {
+.left-brand-panel {
+  background: #3ca0e8;
+  height: 100%;
+}
+.brand-text-split {
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.right-form-panel {
+  background: #ffffff;
+}
+.uppercase-title {
+  letter-spacing: 1px;
+  font-size: 26px;
+  color: #2c3e50;
+}
+.custom-split-input :deep(.q-field__control) {
+  background-color: #f1f5f9 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
+}
+.custom-split-input :deep(.q-field__control:before) {
+  border: none !important;
+}
+.custom-split-input :deep(.q-field__control:after) {
+  border-color: #3ca0e8 !important;
+}
+.split-login-btn {
+  border-radius: 6px !important;
+  padding: 12px 0;
+  background: #3ca0e8 !important;
+}
+.google-split-btn {
+  border-radius: 6px !important;
+  padding: 10px 0;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease;
+}
+.google-split-btn:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+.css-illustration {
+  width: 200px;
+  height: 200px;
+}
+.mail-arch-door {
+  width: 100px;
+  height: 150px;
+  background: #d1dbe5;
+  border-radius: 50px 50px 0 0;
+  border: 3px solid #ffffff;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.door-grid .grid-box {
+  background: #ffffff;
+  height: 32px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.door-handle {
   width: 12px;
   height: 12px;
+  background: #3ca0e8;
   border-radius: 50%;
-  display: inline-block;
+  position: absolute;
+  left: 10px;
+  top: 90px;
+  border: 2px solid #ffffff;
 }
-.dot.close { background-color: #ff5f56; }
-.dot.minimize { background-color: #ffbd2e; }
-.dot.expand { background-color: #27c93f; }
-
-/* 4. RECEPTÁCULO DO AVATAR */
-.mac-avatar-container {
-  width: 70px;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 18px;
-  box-shadow: 
-    4px 4px 10px rgba(160, 175, 190, 0.15),
-    -4px -4px 10px rgba(255, 255, 255, 0.7),
-    inset 2px 2px 5px rgba(160, 175, 190, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+.human-shadow {
+  width: 24px;
+  height: 75px;
+  background: #1e293b;
+  border-radius: 12px 12px 0 0;
+  position: absolute;
+  right: 40px;
+  bottom: 10px;
+  z-index: 3;
 }
-
-/* 5. ENTRADAS DE TEXTO ESTILO MACOS CACHED */
-.mac-input {
-  background: rgba(255, 255, 255, 0.4) !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: inset 2px 2px 5px rgba(140, 155, 170, 0.15);
-  transition: all 0.25s ease;
-  font-size: 14px;
+.human-shadow::before {
+  content: '';
+  width: 26px;
+  height: 25px;
+  background: #4fa8fa;
+  position: absolute;
+  top: 20px;
+  left: -1px;
+  border-radius: 4px;
 }
-.mac-input:focus-within {
-  background: rgba(255, 255, 255, 0.7) !important;
-  border-color: var(--q-primary);
-  box-shadow: 
-    0 0 0 3px rgba(var(--q-primary-rgb), 0.15),
-    inset 1px 1px 2px rgba(140, 155, 170, 0.05);
+.floor-line {
+  width: 220px;
+  height: 3px;
+  background: #1e293b;
+  position: absolute;
+  bottom: 10px;
+  left: -10px;
+  z-index: 1;
+  opacity: 0.3;
 }
-
-/* 6. BOTÃO PREMIUM DO MAC OS */
-.mac-btn {
-  background: var(--q-primary) !important;
-  color: white !important;
-  border-radius: 12px !important;
-  padding: 12px 0;
-  box-shadow: 
-    0 4px 12px rgba(var(--q-primary-rgb), 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-}
-.mac-btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(var(--q-primary-rgb), 0.4);
-}
-.mac-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(var(--q-primary-rgb), 0.3);
-}
-
-/* 7. BOTÃO DO GOOGLE INTEGRADO AO NEUMORFISMO */
-.google-btn {
-  background: rgba(255, 255, 255, 0.5) !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 4px 4px 10px rgba(160, 175, 190, 0.1),
-              -4px -4px 10px rgba(255, 255, 255, 0.5);
-  transition: all 0.2s ease;
-}
-.google-btn:hover {
-  background: rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 4px 4px 12px rgba(160, 175, 190, 0.15);
-}
-
 .text-decoration-none {
   text-decoration: none;
 }
