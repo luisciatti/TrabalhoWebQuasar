@@ -49,6 +49,12 @@
           </q-menu>
         </div>
 
+  <q-layout view="lHh Lpr lFf">
+    <q-header elevated>
+      <q-toolbar>
+        <q-toolbar-title>
+          MailDraft
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
