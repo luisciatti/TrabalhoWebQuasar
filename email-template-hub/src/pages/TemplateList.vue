@@ -8,14 +8,14 @@
       </div>
       
       <!-- Lado Direito: PÍLULA DE PERFIL AUTENTICADO -->
-      <div class="profile-modern row items-center q-gutter-sm cursor-pointer">
+      <div class="profile-modern row items-center q-gutter-xs cursor-pointer">
         <!-- Avatar Redondo com a Inicial -->
         <q-avatar size="40px" color="primary" text-color="white" class="text-weight-bold shadow-1">
           {{ userInitial }}
         </q-avatar>
         
         <!-- Identificação do Usuário -->
-        <div class="column q-mr-xs gt-xs">
+        <div class="column q-mr-none">
           <span class="text-subtitle2 text-weight-bold text-grey-9 line-clamp text-capitalize" style="max-width: 140px;">
             {{ user?.name || 'Usuário Logado' }}
           </span>
@@ -922,7 +922,7 @@ body, .q-page, .page-modern {
 .profile-modern {
   background: #ffffff !important;
   border-radius: 30px;
-  padding: 6px 14px;
+  padding: 4px 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 

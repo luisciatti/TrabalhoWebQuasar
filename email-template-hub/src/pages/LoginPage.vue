@@ -22,15 +22,24 @@
       <!-- Integração da API do Gmail (Design Unificado) -->
       <div class="q-mb-lg">
         <q-btn 
-          label="Conectar com Google" 
-          icon="img:https://developers.google.com/static/identity/images/g-logo.png"
           color="white" 
           text-color="grey-7"
-          class="google-btn full-width text-weight-bold" 
+          class="google-btn full-width text-weight-bold"
           no-caps
           flat
-          @click="connectGmail" 
-        />
+          @click="connectGmail"
+        >
+          <div class="row items-center">
+            <div class="google-icon-container q-mr-sm">
+              <img
+                src="https://developers.google.com/static/identity/images/g-logo.png"
+                width="18"
+              />
+            </div>
+
+            <span>Conectar com Google</span>
+          </div>
+        </q-btn> 
       </div>
 
       <div class="row items-center q-mb-lg text-grey-5">
@@ -49,13 +58,18 @@
             placeholder="nome@exemplo.com" 
             borderless 
             class="mac-input q-px-md"
-            :rules="[val => !!val || 'O e-mail é obrigatório']"
+            @blur="validateEmail(email)"
+            :class="{ 'input-error': emailError }"
             hide-bottom-space
           >
             <template v-slot:prepend>
               <q-icon name="alternate_email" size="xs" color="grey-6" />
             </template>
           </q-input>
+          <div v-if="emailError" class="error-container">
+            <q-icon name="error" size="xs" color="negative" />
+            <span class="error-message">{{ emailError }}</span>
+          </div>  
         </div>
 
         <div>
@@ -66,13 +80,18 @@
             placeholder="••••••••" 
             borderless 
             class="mac-input q-px-md"
-            :rules="[val => !!val || 'A senha é obrigatória']"
+            @blur="validatePassword(password)"
+            :class="{ 'input-error': passwordError }"
             hide-bottom-space
           >
             <template v-slot:prepend>
               <q-icon name="lock" size="xs" color="grey-6" />
             </template>
           </q-input>
+          <div v-if="passwordError" class="error-container">
+            <q-icon name="error" size="xs" color="negative" />
+            <span class="error-message">{{ passwordError }}</span>
+          </div>
         </div>
 
         <div class="q-mt-xl">
@@ -84,6 +103,19 @@
             flat 
             no-caps 
           />
+        </div>
+
+        <div class="text-center q-mt-md">
+          <span class="text-grey-6">
+            Não possui conta?
+          </span>
+
+          <a
+            href="#"
+            class="text-primary text-weight-bold q-ml-xs text-decoration-none"
+          >
+            Cadastrar-se
+          </a>
         </div>
       </q-form>
 
@@ -106,6 +138,27 @@ const $q = useQuasar()
 
 const email = ref('')
 const password = ref('')
+
+const emailError = ref('')
+const passwordError = ref('')
+
+const validateEmail = (val) => {
+  if (!val) {
+    emailError.value = 'O e-mail é obrigatório'
+    return false
+  }
+  emailError.value = ''
+  return true
+}
+
+const validatePassword = (val) => {
+  if (!val) {
+    passwordError.value = 'A senha é obrigatória'
+    return false
+  }
+  passwordError.value = ''
+  return true
+}
 
 const CLIENT_ID = '447644137186-hons62g4jdekbc6hps3pttuh7j21tukt.apps.googleusercontent.com'
 let tokenClient
@@ -279,5 +332,34 @@ function handleLogin() {
 }
 .google-btn:hover {
   background: #e5e7eb !important;
+}
+
+.google-icon-container {
+  background: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-icon-container img {
+  display: block;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
+  font-weight: 500;
+}
+
+.input-error {
+  border-color: #d32f2f !important;
+  background-color: #ffebee !important;
 }
 </style>
