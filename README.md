@@ -4,6 +4,7 @@
 ```bash
 git clone https://github.com/luisciatti/TrabalhoWebQuasar.git
 cd TrabalhoWebQuasar
+cd email-template-hub
 ```
 
 ### 2. Criar e acessar sua branch
